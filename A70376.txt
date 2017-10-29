@@ -1,0 +1,8 @@
+Streptomycin R
+Rifampin R
+ethambutol R 
+pyrazinamide R
+isoniazid R
+Ofloxacin S
+5 DR SNPs
+rpoB Mutation codon 450

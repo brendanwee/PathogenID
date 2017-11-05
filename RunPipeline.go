@@ -52,6 +52,9 @@ func CheckSamFile(memOutputFile string , LN int) bool {
   scanner := bufio.NewScanner(file)
   scanner.Scan()
   words := strings.Split(scanner.Text(),"	")
+  if len(words)<3{
+    return false
+  }
   genomeLength, err := strconv.Atoi((strings.Split(words[2],":")[1]))
   if genomeLength==LN{
     return true
@@ -64,8 +67,21 @@ func GetGenomeLength(genomeFile string) int {
   return 4411532
 }
 
+func CheckReferenceFile(reference string) {
+  file,err := os.Open(reference)
+  CheckError(err)
+  scanner := bufio.NewScanner(file)
+  scanner.Scan()
+  words := strings.Split(scanner.Text(),"	")
+  fmt.Println(words[0])
+
+}
+
 func main() {
-  reference := "Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa"
+  downloadReference:= CreateCommand("curl ftp://ftp.ensemblgenomes.org/pub/bacteria/release-37/fasta/bacteria_0_collection/mycobacterium_tuberculosis_h37rv/dna/Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa.gz")
+  reference := "Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa.gz"
+  OutputCommandToFile(downloadReference, reference)
+  CheckReferenceFile(reference)
   LN:=GetGenomeLength(reference)
   //index genome
   bwaIndex := CreateCommand("bwa index "+reference)
@@ -74,11 +90,19 @@ func main() {
   forwardReads := "A70376.fastq"
   //reverseReads := "A70376_2.fastq"
   memOutputFile := strings.Split(forwardReads,".")[0]+".sam"
-  bwaMem := CreateCommand("bwa mem Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa rpob.fa")
+  bwaMem := CreateCommand("bwa mem " + reference + " rpob.fa")
   OutputCommandToFile(bwaMem, memOutputFile)
+  // this might be cleaner if we put the exit inside the function
   if !CheckSamFile(memOutputFile, LN){
     fmt.Println("BWA mem Failed")
     os.Exit(1)
   }
+
+  //samtools view
+  //samtools sort
+  //samtools mpileup
+  //bcftools call
+  //ProcessVCF()
+  
 
 }

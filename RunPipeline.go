@@ -131,6 +131,10 @@ func DownloadAndIndexReference() (string, int) {
 
 
 func main() {
+  pwd:= CreateCommand("pwd")
+  out,_ := pwd.Output()
+  cwd := string(out)
+  //ensure bwa, smatools, and bcftools exist. ls?
   numProcs := runtime.NumCPU()
   if numProcs >1 { //use all but one Processor just in case
     numProcs -= 1
@@ -141,23 +145,23 @@ func main() {
   forwardReads := "A70376.fastq"
   reverseReads := "A70376_2.fastq"
   samFile := strings.Split(forwardReads,".")[0]+".sam"
-  bwaMem := CreateCommand("bwa mem -t " +strconv.Itoa(numProcs) + " " + reference + " " + forwardReads + " " + reverseReads)
+  bwaMem := CreateCommand(cwd+"/bin/bwa mem -t " +strconv.Itoa(numProcs) + " " + reference + " " + forwardReads + " " + reverseReads)
   OutputCommandToFile(bwaMem, samFile)
   CheckSamFile(samFile, LN)
 
-  samtoolsView := CreateCommand("samtools view -@ " + strconv.Itoa(numProcs-1) + " -bS " + samFile)
+  samtoolsView := CreateCommand(cwd+"/bin/samtools view -@ " + strconv.Itoa(numProcs-1) + " -bS " + samFile)
   bamFile := strings.Split(samFile, ".")[0]+".bam"
   OutputCommandToFile(samtoolsView,bamFile)
 
-  samtoolsSort:= CreateCommand("samtools sort -@ " + strconv.Itoa(numProcs-1) + " " + bamFile)
+  samtoolsSort:= CreateCommand(cwd+"/bin/samtools sort -@ " + strconv.Itoa(numProcs-1) + " " + bamFile)
   sortedBam := strings.Split(bamFile,".")[0]+".sorted.bam"
   OutputCommandToFile(samtoolsSort, sortedBam)
 
 
-  samtoolsMpileup:= CreateCommand("samtools mpileup -v --reference "+reference+" "+sortedBam)
+  samtoolsMpileup:= CreateCommand(cwd+"/bin/samtools mpileup -v --reference "+reference+" "+sortedBam)
   vcfFile := strings.Split(sortedBam,".")[0]+".vcf"
   OutputCommandToFile(samtoolsMpileup, vcfFile)
-  bcfToolsCall := CreateCommand("bcftools call --threads " + strconv.Itoa(numProcs-1) + " --ploidy 1 -c " + vcfFile)
+  bcfToolsCall := CreateCommand(cwd+"/bin/bcftools call --threads " + strconv.Itoa(numProcs-1) + " --ploidy 1 -c " + vcfFile)
   calledVcfFile := strings.Split(sortedBam,".")[0]+".called.vcf"
   OutputCommandToFile(bcfToolsCall, calledVcfFile)
   //ProcessVCF()

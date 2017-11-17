@@ -15,7 +15,7 @@ func CreateCommand(input string) *exec.Cmd{
   items := strings.Fields(input)
   command := items[0]
   args := items[1:]
-  if len(args>0){
+  if len(args)>0{
     fmt.Printf("creating %s %s command \n", command, args[0])
   } else {
     fmt.Printf("creating %s command \n", command)

@@ -64,7 +64,7 @@ func CheckSamFile(samFile string , LN int) {
   }
   genomeLength, err := strconv.Atoi((strings.Split(words[2],":")[1])) //the third word should be LN:num, get num
   if genomeLength!=LN{
-    fmt.Println("Genome length:", genomeLength "!= ", LN, "BWA mem Failed")
+    fmt.Println("Genome length:", genomeLength, "!= ", LN, "BWA mem Failed")
     os.Exit(1)
   }
 }

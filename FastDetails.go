@@ -9,13 +9,6 @@ import(
 
 type adapter [2]string //name then sequence
 
-func CheckError(err error) {
-  if err!=nil{
-    fmt.Println(err)
-    os.Exit(1)
-  }
-}
-
 func MakeAdapterMap() map[adapter]int {
   adapterFile,err := os.Open("adapter.fasta")
   CheckError(err)

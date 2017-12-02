@@ -240,7 +240,7 @@ func MakeVCF(cwd, reference, sortedBam string)string {
   return vcfFile
 }
 
-func CallVCF(cwd, vcfFile, string, numProcs int)string{
+func CallVCF(cwd, vcfFile string, numProcs int)string{
   bcfToolsCall := CreateCommand(cwd+"/bin/bcftools call --threads " + strconv.Itoa(numProcs-1) + " --ploidy 1 -c " + vcfFile)
   calledVCFFile := strings.Split(vcfFile,".")[0]+".called.vcf"
   OutputCommandToFile(bcfToolsCall, calledVCFFile)
@@ -272,9 +272,9 @@ func main() {
   IndexReference(reference)
 
   sortedBam:= AlignReads(cwd, reference, forwardReads, reverseReads, numProcs, LN)
-  vcfFile:= MakeVCF(cwd, reference, sortedBam)
-  calledVCFFile := CallVCF(cwd, vcfFile, numProcs)
+
   calledVCFFile := CallVariants(cwd, reference, sortedBam, numProcs)
+  fmt.Println(calledVCFFile, "Created")
 
   //ProcessVCF()
 }

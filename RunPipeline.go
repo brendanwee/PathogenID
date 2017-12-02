@@ -205,9 +205,14 @@ func PrepareBin(cwd string){
   MakeBinExecutable(cwd)
 }
 
-func MakeSamFile(cwd,reference, forwardReads, reverseReads string, numProcs, LN int) string{
-  samFile := strings.Split(forwardReads,".")[0]+".sam"
-  bwaMem := CreateCommand(cwd+"/bin/bwa mem -t " +strconv.Itoa(numProcs) + " " + reference + " " + forwardReads + " " + reverseReads)
+func MakeSamFile(cwd,reference string, numProcs, LN int, readFiles... string) string{
+  samFile := strings.Split(readFiles[0],".")[0]+".sam"
+  var bwaMem *exec.Cmd
+  if len(readFiles)==2{
+    bwaMem = CreateCommand(cwd+"/bin/bwa mem -t " +strconv.Itoa(numProcs) + " " + reference + " " + readFiles[0] + " " + readFiles[1])
+  } else {
+    bwaMem = CreateCommand(cwd+"/bin/bwa mem -t " +strconv.Itoa(numProcs) + " " + reference + " " + readFiles[0])
+  }
   OutputCommandToFile(bwaMem, samFile)
   CheckSamFile(samFile, LN)
   return samFile
@@ -227,8 +232,14 @@ func SortBamFile(cwd, bamFile string, numProcs int) string {
   return sortedBam
 }
 
-func AlignReads(cwd, reference, forwardReads, reverseReads string, numProcs, LN int) string{
-  samFile := MakeSamFile(cwd,reference, forwardReads, reverseReads, numProcs, LN)
+func AlignReads(cwd, reference string, readFiles []string, numProcs, LN int, pairedEnd bool) string{
+  var samFile string
+  if pairedEnd{
+    samFile = MakeSamFile(cwd,reference, numProcs, LN, readFiles[0], readFiles[1])
+  } else {
+    samFile = MakeSamFile(cwd,reference, numProcs, LN, readFiles[0])
+  }
+
   bamFile := MakeBamFile(cwd,samFile, numProcs)
   sortedBam := SortBamFile(cwd, bamFile, numProcs)
   return sortedBam
@@ -254,7 +265,23 @@ func CallVariants(cwd, reference, sortedBam string, numProcs int) string{
   return calledVCFFile
 }
 
-func main() {
+func HandleReference(cwd string)  (string, int){
+  reference, LN := GetReference()
+  IndexReference(cwd,reference)
+  return reference, LN
+}
+
+func GetSampleData(cwd string) []string{
+  path := cwd+"/SampleData/"
+  var readFiles []string
+  forward := UnzipFile(path+"test_data.fastq.gz")
+  reverse := UnzipFile(path+"test_rev.fastq.gz")
+  readFiles = append(readFiles, forward)
+  readFiles = append(readFiles, reverse)
+  return readFiles
+}
+
+func RunPipeline(readFiles []string) {
   pwd:= CreateCommand("pwd")
   cwd := WriteOutputToString(pwd)
   PrepareBin(cwd)
@@ -263,21 +290,26 @@ func main() {
   if numProcs >1 { //use all but one Processor just in case
     numProcs -= 1
   }
-
+  pairedEnd := (len(readFiles)==2)
   //get Filename reads()
-  forwardReads := "test_fwd.fastq"
-  reverseReads := "test_rev.fastq"
 
+  if len(readFiles)==0{
+    //Use sample data
+    readFiles = GetSampleData(cwd)
+  }
 
   //identify oraganism
+  reference,LN := HandleReference(cwd)
 
-  reference, LN := GetReference()
-  IndexReference(cwd,reference)
-
-  sortedBam:= AlignReads(cwd, reference, forwardReads, reverseReads, numProcs, LN)
+  sortedBam:= AlignReads(cwd, reference, readFiles, numProcs, LN, pairedEnd)
 
   calledVCFFile := CallVariants(cwd, reference, sortedBam, numProcs)
   fmt.Println(calledVCFFile, "Created")
 
   //ProcessVCF()
+}
+
+func main(){
+  var s []string
+  RunPipeline(s)
 }

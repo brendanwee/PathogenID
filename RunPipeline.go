@@ -116,58 +116,165 @@ func MD5(filename string) string {
   return md5Text
 }
 
-//downlaods the Tuberculosis reference genome and returns the filename as well as its genome length
-func DownloadAndIndexReference() (string, int) {
+func UnzipFile(file string) string {
+  if strings.HasSuffix(file, ".gz") {
+    gunzip := CreateCommand("gunzip " + file)
+    RunCommand(gunzip)
+  }
+  return strings.TrimSuffix(file, ".gz")
+}
+
+func DownloadReference() string{
   downloadReference:= CreateCommand("curl ftp://ftp.ensemblgenomes.org/pub/bacteria/release-37/fasta/bacteria_0_collection/mycobacterium_tuberculosis_h37rv/dna/Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa.gz")
   reference := "Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa.gz"
   OutputCommandToFile(downloadReference, reference)
   CheckReferenceFile(reference)
-  if strings.HasSuffix(reference, ".gz") {
-    gunzip := CreateCommand("gunzip " + reference)
-    RunCommand(gunzip)
-    reference = "Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa"
-  }
-  LN:=GetGenomeLength(reference)
+  reference = UnzipFile(reference)
+  return reference
+}
+
+func IndexReference(reference string) {
   //index genome
   bwaIndex := CreateCommand("bwa index "+reference)
   RunCommand(bwaIndex)
-  return reference, LN
 }
 
+func WriteOutputToString(cmd *exec.Cmd) string{
+  out,err := cmd.Output()
+  CheckError(err)
+  return string(out)[:len(out)-1]
+}
 
-func main() {
-  pwd:= CreateCommand("pwd")
-  out,_ := pwd.Output()
-  cwd := string(out)
-  //ensure bwa, smatools, and bcftools exist. ls?
-  numProcs := runtime.NumCPU()
-  if numProcs >1 { //use all but one Processor just in case
-    numProcs -= 1
+func CheckBin(cwd string){
+  fmt.Println(cwd)
+  cmd := "ls "+cwd+"/bin"
+  lsBin:=CreateCommand(cmd)
+  binContents := WriteOutputToString(lsBin)
+  if !strings.Contains(binContents, "bwa") || !strings.Contains(binContents, "samtools") || !strings.Contains(binContents, "bcftools") {
+    fmt.Println("ERROR: Repository did not download correctly. Please redownload from https://github.com/bweestyle/PathogenID")
+    os.Exit(1)
   }
-  reference, LN := DownloadAndIndexReference()
+}
 
-  //get Filename reads()
-  forwardReads := "A70376.fastq"
-  reverseReads := "A70376_2.fastq"
+func MakeBinExecutable(cwd string) {
+  executables := []string{"bwa", "samtools", "bcftools"}
+  for i:=0;i<len(executables);i++{
+    fmt.Println("chmod 755 " + cwd+"/"+executables[i])
+    cmd := CreateCommand("chmod 755 " + cwd+"/bin/"+executables[i])
+    cmd.Run()
+  }
+}
+
+func ReferenceExists() (bool, string){
+  ls:=exec.Command("ls")
+  contents := WriteOutputToString(ls)
+  if !strings.Contains(contents, "Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa"){
+    return false, ""
+  }
+  return true, contents
+}
+
+func RetrieveReference(contents string) string{
+  var reference string
+  if strings.Contains(contents, "Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa"){
+    reference = "Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa"
+  } else if strings.Contains(contents, "Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa.gz"){
+    reference = UnzipFile("Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa.gz")
+  } else {
+    fmt.Println("ERROR: reference not detected! Downloading Reference Genome")
+    reference = DownloadReference()
+  }
+  return reference
+}
+
+func GetReference() (string, int) {
+  var reference string
+  var LN int
+  if exists,contents:= ReferenceExists(); exists {
+    reference = RetrieveReference(contents)
+  } else {
+    reference = DownloadReference()
+  }
+  LN = GetGenomeLength(reference)
+  return reference,LN
+}
+
+func PrepareBin(cwd string){
+  CheckBin(cwd)
+  MakeBinExecutable(cwd)
+}
+
+func MakeSamFile(cwd,reference, forwardReads, reverseReads string, numProcs, LN int) string{
   samFile := strings.Split(forwardReads,".")[0]+".sam"
   bwaMem := CreateCommand(cwd+"/bin/bwa mem -t " +strconv.Itoa(numProcs) + " " + reference + " " + forwardReads + " " + reverseReads)
   OutputCommandToFile(bwaMem, samFile)
   CheckSamFile(samFile, LN)
+  return samFile
+}
 
+func MakeBamFile(cwd, samFile string, numProcs int) string{
   samtoolsView := CreateCommand(cwd+"/bin/samtools view -@ " + strconv.Itoa(numProcs-1) + " -bS " + samFile)
   bamFile := strings.Split(samFile, ".")[0]+".bam"
   OutputCommandToFile(samtoolsView,bamFile)
+  return bamFile
+}
 
+func SortBamFile(cwd, bamFile string, numProcs int) string {
   samtoolsSort:= CreateCommand(cwd+"/bin/samtools sort -@ " + strconv.Itoa(numProcs-1) + " " + bamFile)
   sortedBam := strings.Split(bamFile,".")[0]+".sorted.bam"
   OutputCommandToFile(samtoolsSort, sortedBam)
+  return sortedBam
+}
 
+func AlignReads(cwd, reference, forwardReads, reverseReads string, numProcs, LN int) string{
+  samFile := MakeSamFile(cwd,reference, forwardReads, reverseReads, numProcs, LN)
+  bamFile := MakeBamFile(cwd,samFile, numProcs)
+  sortedBam := SortBamFile(cwd, bamFile, numProcs)
+  return sortedBam
+}
 
+func MakeVCF(cwd, reference, sortedBam string)string {
   samtoolsMpileup:= CreateCommand(cwd+"/bin/samtools mpileup -v --reference "+reference+" "+sortedBam)
   vcfFile := strings.Split(sortedBam,".")[0]+".vcf"
   OutputCommandToFile(samtoolsMpileup, vcfFile)
+  return vcfFile
+}
+
+func CallVCF(cwd, vcfFile, string, numProcs int)string{
   bcfToolsCall := CreateCommand(cwd+"/bin/bcftools call --threads " + strconv.Itoa(numProcs-1) + " --ploidy 1 -c " + vcfFile)
-  calledVcfFile := strings.Split(sortedBam,".")[0]+".called.vcf"
-  OutputCommandToFile(bcfToolsCall, calledVcfFile)
+  calledVCFFile := strings.Split(vcfFile,".")[0]+".called.vcf"
+  OutputCommandToFile(bcfToolsCall, calledVCFFile)
+  return calledVCFFile
+}
+
+func CallVariants(cwd, reference, sortedBam string, numProcs int) string{
+  vcfFile:= MakeVCF(cwd, reference, sortedBam)
+  calledVCFFile := CallVCF(cwd, vcfFile, numProcs)
+  return calledVCFFile
+}
+
+func main() {
+  pwd:= CreateCommand("pwd")
+  cwd := WriteOutputToString(pwd)
+  PrepareBin(cwd)
+
+  numProcs := runtime.NumCPU()
+  if numProcs >1 { //use all but one Processor just in case
+    numProcs -= 1
+  }
+
+  //get Filename reads()
+  forwardReads := "test_fwd.fastq"
+  reverseReads := "test_rev.fastq"
+  //identify oraganism
+
+  reference, LN := GetReference()
+  IndexReference(reference)
+
+  sortedBam:= AlignReads(cwd, reference, forwardReads, reverseReads, numProcs, LN)
+  vcfFile:= MakeVCF(cwd, reference, sortedBam)
+  calledVCFFile := CallVCF(cwd, vcfFile, numProcs)
+  calledVCFFile := CallVariants(cwd, reference, sortedBam, numProcs)
+
   //ProcessVCF()
 }

@@ -228,6 +228,7 @@ func SortBamFile(cwd, bamFile string, numProcs int) string {
 }
 
 func AlignReads(cwd, reference, forwardReads, reverseReads string, numProcs, LN int) string{
+  IndexReference(reference)
   samFile := MakeSamFile(cwd,reference, forwardReads, reverseReads, numProcs, LN)
   bamFile := MakeBamFile(cwd,samFile, numProcs)
   sortedBam := SortBamFile(cwd, bamFile, numProcs)

@@ -59,12 +59,12 @@ func CheckSamFile(samFile string , LN int) {
   scanner.Scan()
   words := strings.Split(scanner.Text(),"	")
   if len(words)<3{ //check that there are at least 3 items in the first line
-    fmt.Println("BWA mem Failed")
+    fmt.Println("Less than three items in the first line. BWA mem Failed")
     os.Exit(1)
   }
   genomeLength, err := strconv.Atoi((strings.Split(words[2],":")[1])) //the third word should be LN:num, get num
   if genomeLength!=LN{
-    fmt.Println("BWA mem Failed")
+    fmt.Println("Genome length:", genomeLength "!= ", LN, "BWA mem Failed")
     os.Exit(1)
   }
 }

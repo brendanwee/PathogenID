@@ -12,13 +12,14 @@ import(
 
 
 func CreateCommand(input string) *exec.Cmd{
+
   items := strings.Fields(input)
   command := items[0]
   args := items[1:]
   if len(args)>0{
-    fmt.Printf("creating %s %s command \n", command, args[0])
+    fmt.Printf("creating %s command \n", input)
   } else {
-    fmt.Printf("creating %s command \n", command)
+    fmt.Printf("creating %s command \n", input)
   }
 
 
@@ -266,6 +267,8 @@ func main() {
   //get Filename reads()
   forwardReads := "test_fwd.fastq"
   reverseReads := "test_rev.fastq"
+
+
   //identify oraganism
 
   reference, LN := GetReference()

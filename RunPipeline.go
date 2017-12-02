@@ -134,9 +134,9 @@ func DownloadReference() string{
   return reference
 }
 
-func IndexReference(reference string) {
+func IndexReference(cwd,reference string) {
   //index genome
-  bwaIndex := CreateCommand("bwa index "+reference)
+  bwaIndex := CreateCommand(cwd+"/bin/bwa index "+reference)
   RunCommand(bwaIndex)
 }
 
@@ -273,7 +273,7 @@ func main() {
   //identify oraganism
 
   reference, LN := GetReference()
-  IndexReference(reference)
+  IndexReference(cwd,reference)
 
   sortedBam:= AlignReads(cwd, reference, forwardReads, reverseReads, numProcs, LN)
 

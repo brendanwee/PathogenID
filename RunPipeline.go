@@ -170,11 +170,6 @@ func OnlyAlign(readFiles []string) string {
 }
 
 func OnlyVCF(bamFiles []string) string{
-  if len(bamFiles) == 0 {
-    //Use sample data
-    fmt.Println("ERROR: No files recieved. Please open a sorted bam file of tuberculosis")
-    return
-  }
   reference,_ := HandleReference()
 	IndexReference(reference)
 
@@ -186,12 +181,6 @@ func OnlyVCF(bamFiles []string) string{
 func RunPipeline(readFiles []string) {
 	pairedEnd := (len(readFiles) == 2)
 	//get Filename reads()
-
-	if len(readFiles) == 0 {
-		//Use sample data
-		fmt.Println("ERROR: No files recieved. Please open a single end or paired end fastq file of tuberculosis")
-    return
-	}
 
 	reference, LN := HandleReference()
 	IndexReference(reference)

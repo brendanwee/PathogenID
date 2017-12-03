@@ -58,8 +58,8 @@ func MD5(filename string) string {
 
 
 func DownloadReference() string{
-  downloadReference:= CreateCommand("curl ftp://ftp.ensemblgenomes.org/pub/bacteria/release-37/fasta/bacteria_0_collection/mycobacterium_tuberculosis_h37rv/dna/Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa.gz")
-  reference := "Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa.gz"
+  reference := outputPath+"Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa.gz"
+  downloadReference:= CreateCommand("curl -o "+ reference + " ftp://ftp.ensemblgenomes.org/pub/bacteria/release-37/fasta/bacteria_0_collection/mycobacterium_tuberculosis_h37rv/dna/Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa.gz")
   OutputCommandToFile(downloadReference, reference)
   CheckReferenceFile(reference)
   reference = UnzipFile(reference)
@@ -67,12 +67,14 @@ func DownloadReference() string{
 }
 
 func ReferenceExists() (bool, string){
-  ls:=exec.Command("ls")
-  contents := WriteOutputToString(ls)
-  if !strings.Contains(contents, "Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa"){
+  fmt.Println(outputPath)
+  ls:=exec.Command("ls "+outputPath)
+  fmt.Println("here")
+  contents,_ := ls.Output()
+  if !strings.Contains(string(contents), "Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa"){
     return false, ""
   }
-  return true, contents
+  return true, string(contents)
 }
 
 func HandleReference()  (string, int){
@@ -90,9 +92,9 @@ func HandleReference()  (string, int){
 func PrepareReference(contents string) string{
   var reference string
   if strings.Contains(contents, "Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa.gz"){
-    reference = UnzipFile("Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa")
+    reference = UnzipFile(outputPath+"Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa.gz")
   } else if strings.Contains(contents, "Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa"){
-    reference = "Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa"
+    reference = outputPath+"Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa"
   } else {
     fmt.Println("ERROR: reference not detected! Downloading Reference Genome")
     reference = DownloadReference()

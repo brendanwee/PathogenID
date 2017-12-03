@@ -12,6 +12,7 @@ import (
 
 func CheckError(err error) {
 	if err != nil {
+    fmt.Println("ERROR:")
 		fmt.Println(err)
 		os.Exit(1)
 	}
@@ -132,6 +133,11 @@ func MakeAnalysisFolder() string {
 	analysisFolder := cwd + "/Analysis/"
 	RunCommand(CreateCommand("mkdir " + analysisFolder))
 	return analysisFolder
+}
+
+func DownloadDriver() {
+  download := CreateCommand("go get -u github.com/murlokswarm/mac")
+  RunCommand(download)
 }
 
 func GetSampleData() []string {

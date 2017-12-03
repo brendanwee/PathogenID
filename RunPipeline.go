@@ -180,6 +180,11 @@ func OnlyVCF(bamFiles []string) string{
 }
 
 func RunPipeline(readFiles []string) {
+	if len(readFiles ==0){
+		fmt.Println("No files recieved")
+		return
+	}
+
 	pairedEnd := (len(readFiles) == 2)
 	//get Filename reads()
 

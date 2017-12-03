@@ -73,7 +73,7 @@ func newSubWindow() app.Contexter {
 	return subwin
 }
 
-//
+// OnFastqButtonClick is called when our users want to
 func (f *FileSummary) OnFastqButtonClick() {
 	f.Output = "Fastq summay present here!"
 	app.Render(f)           // Tells the app to update the rendering of the component.

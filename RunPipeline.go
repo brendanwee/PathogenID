@@ -10,39 +10,6 @@ import(
   "runtime"
 )
 
-
-func CreateCommand(input string) *exec.Cmd{
-
-  items := strings.Fields(input)
-  command := items[0]
-  args := items[1:]
-  if len(args)>0{
-    fmt.Printf("creating %s command \n", input)
-  } else {
-    fmt.Printf("creating %s command \n", input)
-  }
-
-
-  cmd := exec.Command(command, args...)
-  return cmd
-}
-
-func RunCommand(cmd *exec.Cmd){
-  cmd.Run()
-  cmd.Wait()
-}
-
-func OutputCommandToFile(cmd *exec.Cmd, filename string){
-  file, err := os.Create(filename)
-  if err != nil {
-    fmt.Println(err)
-    os.Exit(1)
-  }
-  cmd.Stdout = file
-  cmd.Run()
-  cmd.Wait()
-}
-
 func CheckError(err error) {
   if err!=nil{
     fmt.Println(err)
@@ -62,77 +29,11 @@ func CheckSamFile(samFile string , LN int) {
     fmt.Println("Less than three items in the first line. BWA mem Failed")
     os.Exit(1)
   }
-
   genomeLength, err := strconv.Atoi(words[2]) //the third word should be LN:num, get num
   if genomeLength!=LN{
     fmt.Println("Genome length:", genomeLength, "!= ", LN, "BWA mem Failed")
     os.Exit(1)
   }
-}
-
-//takes a genomeFile and returns the amount of nucleotides in it.
-func GetGenomeLength(genomeFile string) int {
-  file,err := os.Open(genomeFile)
-  CheckError(err)
-  scanner := bufio.NewScanner(file)
-  var LN int
-  for scanner.Scan(){
-    if scanner.Text()[0]=='>' || scanner.Text()[0]=='@' {
-      continue
-    } else if scanner.Text()[0]=='+' { //skip two lines
-      scanner.Scan()// quality line
-      continue
-    } else {
-      LN += len(scanner.Text())
-    }
-  }
-  return LN
-}
-
-func CheckReferenceFile(reference string) {
-  md5 := MD5(reference)
-  errorMessage := `ERROR: Reference file did not download properly. Please check
-                   your internet connection and try again`
-  if strings.HasSuffix(reference, ".gz"){
-    if md5 != "c34fb6593a6cbdbcfc0ac8d0c7db58ee" {
-      fmt.Println(errorMessage)
-      os.Exit(1)
-    }
-  } else {
-    if md5 != "8c6a53ab340a9429c0db9a30801235c4" {
-      fmt.Println(errorMessage)
-      os.Exit(1)
-    }
-  }
-}
-
-func MD5(filename string) string {
-  md5 := CreateCommand("md5 "+filename)
-  OutputCommandToFile(md5, filename+".md5")
-  file,err:=os.Open(filename+".md5")
-  CheckError(err)
-  scanner := bufio.NewScanner(file)
-  scanner.Scan()
-  fmt.Println(scanner.Text())
-  md5Text := strings.Split(scanner.Text(), " ")[3]
-  return md5Text
-}
-
-func UnzipFile(file string) string {
-  if strings.HasSuffix(file, ".gz") {
-    gunzip := CreateCommand("gunzip " + file)
-    RunCommand(gunzip)
-  }
-  return strings.TrimSuffix(file, ".gz")
-}
-
-func DownloadReference() string{
-  downloadReference:= CreateCommand("curl ftp://ftp.ensemblgenomes.org/pub/bacteria/release-37/fasta/bacteria_0_collection/mycobacterium_tuberculosis_h37rv/dna/Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa.gz")
-  reference := "Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa.gz"
-  OutputCommandToFile(downloadReference, reference)
-  CheckReferenceFile(reference)
-  reference = UnzipFile(reference)
-  return reference
 }
 
 func IndexReference(cwd,reference string) {
@@ -141,14 +42,7 @@ func IndexReference(cwd,reference string) {
   RunCommand(bwaIndex)
 }
 
-func WriteOutputToString(cmd *exec.Cmd) string{
-  out,err := cmd.Output()
-  CheckError(err)
-  return string(out)[:len(out)-1]
-}
-
 func CheckBin(cwd string){
-  fmt.Println(cwd)
   cmd := "ls "+cwd+"/bin"
   lsBin:=CreateCommand(cmd)
   binContents := WriteOutputToString(lsBin)
@@ -167,47 +61,15 @@ func MakeBinExecutable(cwd string) {
   }
 }
 
-func ReferenceExists() (bool, string){
-  ls:=exec.Command("ls")
-  contents := WriteOutputToString(ls)
-  if !strings.Contains(contents, "Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa"){
-    return false, ""
-  }
-  return true, contents
-}
-
-func RetrieveReference(contents string) string{
-  var reference string
-  if strings.Contains(contents, "Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa"){
-    reference = "Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa"
-  } else if strings.Contains(contents, "Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa.gz"){
-    reference = UnzipFile("Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa.gz")
-  } else {
-    fmt.Println("ERROR: reference not detected! Downloading Reference Genome")
-    reference = DownloadReference()
-  }
-  return reference
-}
-
-func GetReference() (string, int) {
-  var reference string
-  var LN int
-  if exists,contents:= ReferenceExists(); exists {
-    reference = RetrieveReference(contents)
-  } else {
-    reference = DownloadReference()
-  }
-  LN = GetGenomeLength(reference)
-  return reference,LN
-}
-
 func PrepareBin(cwd string){
   CheckBin(cwd)
   MakeBinExecutable(cwd)
 }
 
-func MakeSamFile(cwd,reference string, numProcs, LN int, readFiles... string) string{
-  samFile := strings.Split(readFiles[0],".")[0]+".sam"
+func MakeSamFile(cwd,reference string, numProcs, LN int, analysisFolder string, readFiles... string) string{
+  folders := strings.Split(strings.TrimSuffix(readFiles[0],".fastq"),"/")
+  filename := folders[len(folders)-1]
+  samFile := analysisFolder + filename+".sam"
   var bwaMem *exec.Cmd
   if len(readFiles)==2{
     bwaMem = CreateCommand(cwd+"/bin/bwa mem -t " +strconv.Itoa(numProcs) + " " + reference + " " + readFiles[0] + " " + readFiles[1])
@@ -215,6 +77,7 @@ func MakeSamFile(cwd,reference string, numProcs, LN int, readFiles... string) st
     bwaMem = CreateCommand(cwd+"/bin/bwa mem -t " +strconv.Itoa(numProcs) + " " + reference + " " + readFiles[0])
   }
   OutputCommandToFile(bwaMem, samFile)
+  fmt.Println(samFile, "made")
   CheckSamFile(samFile, LN)
   return samFile
 }
@@ -233,12 +96,12 @@ func SortBamFile(cwd, bamFile string, numProcs int) string {
   return sortedBam
 }
 
-func AlignReads(cwd, reference string, readFiles []string, numProcs, LN int, pairedEnd bool) string{
+func AlignReads(cwd, reference string, readFiles []string, numProcs, LN int, pairedEnd bool, analysisFolder string) string{
   var samFile string
   if pairedEnd{
-    samFile = MakeSamFile(cwd,reference, numProcs, LN, readFiles[0], readFiles[1])
+    samFile = MakeSamFile(cwd,reference, numProcs, LN, analysisFolder, readFiles[0], readFiles[1])
   } else {
-    samFile = MakeSamFile(cwd,reference, numProcs, LN, readFiles[0])
+    samFile = MakeSamFile(cwd,reference, numProcs, LN, analysisFolder, readFiles[0])
   }
 
   bamFile := MakeBamFile(cwd,samFile, numProcs)
@@ -266,10 +129,15 @@ func CallVariants(cwd, reference, sortedBam string, numProcs int) string{
   return calledVCFFile
 }
 
-func HandleReference(cwd string)  (string, int){
-  reference, LN := GetReference()
-  IndexReference(cwd,reference)
-  return reference, LN
+func MakeAnalysisFolder(readFiles []string) string{
+  folders := strings.Split(readFiles[0],"/")
+  dataLocation :=""
+  for i:=1;i<len(folders)-1;i++{
+    dataLocation = dataLocation+"/"+folders[i]
+  }
+  analysisFolder:=dataLocation+"/Analysis/"
+  RunCommand(CreateCommand("mkdir "+analysisFolder))
+  return analysisFolder
 }
 
 func GetSampleData(cwd string) []string{
@@ -299,10 +167,12 @@ func RunPipeline(readFiles []string) {
     readFiles = GetSampleData(cwd)
   }
 
+  analysisFolder := MakeAnalysisFolder(readFiles)
+
   //identify oraganism
   reference,LN := HandleReference(cwd)
-
-  sortedBam:= AlignReads(cwd, reference, readFiles, numProcs, LN, pairedEnd)
+  IndexReference(cwd, reference)
+  sortedBam:= AlignReads(cwd, reference, readFiles, numProcs, LN, pairedEnd, analysisFolder)
 
   calledVCFFile := CallVariants(cwd, reference, sortedBam, numProcs)
   fmt.Println(calledVCFFile, "Created")

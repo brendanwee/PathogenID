@@ -177,11 +177,6 @@ func OnlyVCF(bamFiles []string) string {
 =======
 >>>>>>> parent of 5d21ffe... finish first three buttons in AnalyzeButton
 func OnlyVCF(bamFiles []string) string{
-  if len(bamFiles) == 0 {
-    //Use sample data
-    fmt.Println("ERROR: No files recieved. Please open a sorted bam file of tuberculosis")
-    return
-  }
   reference,_ := HandleReference()
 <<<<<<< HEAD
 >>>>>>> parent of 5d21ffe... finish first three buttons in AnalyzeButton

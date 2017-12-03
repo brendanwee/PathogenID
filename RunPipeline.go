@@ -169,7 +169,7 @@ func OnlyAlign(readFiles []string) string {
 	return samFile
 }
 
-func OnlyVCF(bamFiles []string){
+func OnlyVCF(bamFiles []string) string{
   if len(bamFiles) == 0 {
     //Use sample data
     fmt.Println("ERROR: No files recieved. Please open a sorted bam file of tuberculosis")
@@ -177,10 +177,10 @@ func OnlyVCF(bamFiles []string){
   }
   reference,_ := HandleReference()
 	IndexReference(reference)
-  for i := range(bamFiles){
-    calledVCFFile := CallVariants(reference, bamFiles[i])
-    vcf = append(vcf,calledVCFFile)
-  }
+
+  calledVCFFile := CallVariants(reference, bamFiles[0])
+
+	return calledVCFFile
 }
 
 func RunPipeline(readFiles []string) {

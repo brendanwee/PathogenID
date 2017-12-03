@@ -197,7 +197,7 @@ func RunPipeline(readFiles []string) {
 
   //identify oraganism
   reference,LN := HandleReference()
-  IndexReference(analysis reference)
+  IndexReference(analysis, reference)
   sortedBam:= AlignReads(reference, readFiles, numProcs, LN, pairedEnd, analysisFolder)
 
   calledVCFFile := CallVariants(reference, sortedBam, numProcs)

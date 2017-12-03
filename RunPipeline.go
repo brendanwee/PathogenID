@@ -11,7 +11,7 @@ import (
 
 func CheckError(err error) {
 	if err != nil {
-		fmt.Println("ERROR:")
+    fmt.Println("ERROR:")
 		fmt.Println(err)
 		os.Exit(1)
 	}
@@ -135,8 +135,8 @@ func MakeAnalysisFolder() string {
 }
 
 func DownloadDriver() {
-	download := CreateCommand("go get -u github.com/murlokswarm/mac")
-	RunCommand(download)
+  download := CreateCommand("go get -u github.com/murlokswarm/mac")
+  RunCommand(download)
 }
 
 func GetSampleData() []string {
@@ -169,12 +169,27 @@ func OnlyAlign(readFiles []string) string {
 	return samFile
 }
 
+<<<<<<< HEAD
+<<<<<<< HEAD
 func OnlyVCF(bamFiles []string) string {
 	reference, _ := HandleReference()
-
+=======
+=======
+>>>>>>> parent of 5d21ffe... finish first three buttons in AnalyzeButton
+func OnlyVCF(bamFiles []string) string{
+  if len(bamFiles) == 0 {
+    //Use sample data
+    fmt.Println("ERROR: No files recieved. Please open a sorted bam file of tuberculosis")
+    return
+  }
+  reference,_ := HandleReference()
+<<<<<<< HEAD
+>>>>>>> parent of 5d21ffe... finish first three buttons in AnalyzeButton
+=======
+>>>>>>> parent of 5d21ffe... finish first three buttons in AnalyzeButton
 	IndexReference(reference)
 
-	calledVCFFile := CallVariants(reference, bamFiles[0])
+  calledVCFFile := CallVariants(reference, bamFiles[0])
 
 	return calledVCFFile
 }
@@ -183,12 +198,15 @@ func RunPipeline(readFiles []string) {
 	pairedEnd := (len(readFiles) == 2)
 	//get Filename reads()
 
+<<<<<<< HEAD
+=======
 	if len(readFiles) == 0 {
 		//Use sample data
 		fmt.Println("ERROR: No files recieved. Please open a single end or paired end fastq file of tuberculosis")
-		return
+    return
 	}
 
+>>>>>>> parent of 5d21ffe... finish first three buttons in AnalyzeButton
 	reference, LN := HandleReference()
 	IndexReference(reference)
 	sortedBam := AlignReads(reference, readFiles, LN, pairedEnd)

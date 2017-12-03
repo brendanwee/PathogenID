@@ -66,6 +66,8 @@ func PrepareBin(cwd string){
   MakeBinExecutable(cwd)
 }
 
+
+
 func MakeSamFile(cwd,reference string, numProcs, LN int, analysisFolder string, readFiles... string) string{
   folders := strings.Split(strings.TrimSuffix(readFiles[0],".fastq"),"/")
   filename := folders[len(folders)-1]
@@ -77,7 +79,6 @@ func MakeSamFile(cwd,reference string, numProcs, LN int, analysisFolder string, 
     bwaMem = CreateCommand(cwd+"/bin/bwa mem -t " +strconv.Itoa(numProcs) + " " + reference + " " + readFiles[0])
   }
   OutputCommandToFile(bwaMem, samFile)
-  fmt.Println(samFile, "made")
   CheckSamFile(samFile, LN)
   return samFile
 }
@@ -148,6 +149,36 @@ func GetSampleData(cwd string) []string{
   readFiles = append(readFiles, forward)
   readFiles = append(readFiles, reverse)
   return readFiles
+}
+
+func pwd()string{
+  pwd:= CreateCommand("pwd")
+  cwd := WriteOutputToString(pwd)
+  return cwd
+}
+
+func OnlyAlign(readFiles []string) string{
+  cwd := pwd()
+  PrepareBin(cwd)
+
+  numProcs := runtime.NumCPU()
+  if numProcs >1 { //use all but one Processor just in case
+    numProcs -= 1
+  }
+
+  analysisFolder := MakeAnalysisFolder(readFiles)
+
+  //identify oraganism
+  reference,LN := HandleReference(cwd)
+  IndexReference(cwd, reference)
+
+  var samFile string
+  if len(readFiles)==2{
+    samFile = MakeSamFile(cwd,reference, numProcs, LN, analysisFolder, readFiles[0], readFiles[1])
+  } else {
+    samFile = MakeSamFile(cwd,reference, numProcs, LN, analysisFolder, readFiles[0])
+  }
+  return samFile
 }
 
 func RunPipeline(readFiles []string) {

@@ -1,0 +1,30 @@
+work log 
+10.30
+
+1.
+follow the instructions on https://github.com/murlokswarm/app#gettingstarted and download the app package 
+
+2. package structure 
+package/            # Your package.
+    resources/      # Root for resources. Should contain only files related to app functionment.
+        css/        # All the .css files.
+        scss/       # All the .scss files (optional).
+        js/         # All the .js files (optional).
+    main.go         # Your main.
+    *.go            # Other .go files.
+
+3.
+download sass http://sass-lang.com/install
+sudo gem install sass
+
+
+4.
+successfully repeat others hallo application
+
+
+11.5
+App design writeup 
+
+
+
+

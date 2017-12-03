@@ -1,0 +1,58 @@
+body {
+    background-image: url("../bg1.jpg");
+    background-size: cover;
+    background-position: center;
+    color: white;
+    overflow: hidden;
+}
+
+.WindowLayout {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.HelloBox {
+    padding: 20pt;
+}
+
+h1 {
+    font-weight: 300;
+}
+
+input {
+    width: 100%;
+    padding: 5pt;
+    border: 1pt;
+    border-left: 2px solid silver;
+    border-style: inset;
+    outline: none;
+    font-size: 14px;
+    background: transparent;
+    color: white;
+}
+
+input:focus {
+    border-left-color: deepskyblue;
+}
+
+button2 {
+  position: absolute;
+  top: 52%;
+  left: 70%;  
+  border:none;
+  padding: 0;
+  font-size: 16px;
+  text-decoration: initial;
+  color: white;
+  background-color: none;
+  cursor: pointer
+}
+
+button2:hover {
+  color: deepskyblue;
+}
+

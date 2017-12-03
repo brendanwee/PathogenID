@@ -5,6 +5,10 @@ import(
   "bufio"
   "strings"
   "os"
+  /*"github.com/gonum/plot"
+	"github.com/gonum/plot/plotter"
+	"github.com/gonum/plot/plotutil"
+	"github.com/gonum/plot/vg"*/
 )
 
 type adapter [2]string //name then sequence

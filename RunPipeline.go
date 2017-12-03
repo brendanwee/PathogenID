@@ -161,6 +161,11 @@ func OnlyAlign(readFiles []string) string{
   cwd := pwd()
   PrepareBin(cwd)
 
+  if len(readFiles)==0{
+    //Use sample data
+    readFiles = GetSampleData(cwd)
+  }
+
   numProcs := runtime.NumCPU()
   if numProcs >1 { //use all but one Processor just in case
     numProcs -= 1
@@ -213,5 +218,5 @@ func RunPipeline(readFiles []string) {
 
 func main(){
   var s []string
-  RunPipeline(s)
+  OnlyAlign(s)
 }

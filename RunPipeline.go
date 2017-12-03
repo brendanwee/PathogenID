@@ -199,6 +199,7 @@ func RunPipeline(readFiles []string) {
 	//get Filename reads()
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 	if len(readFiles) == 0 {
 		//Use sample data
@@ -207,6 +208,8 @@ func RunPipeline(readFiles []string) {
 	}
 
 >>>>>>> parent of 5d21ffe... finish first three buttons in AnalyzeButton
+=======
+>>>>>>> b995b62c247807cf4f35eacb5ecb3676c31c5743
 	reference, LN := HandleReference()
 	IndexReference(reference)
 	sortedBam := AlignReads(reference, readFiles, LN, pairedEnd)

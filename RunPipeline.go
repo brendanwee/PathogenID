@@ -193,7 +193,7 @@ func RunPipeline(readFiles []string) {
     readFiles = GetSampleData()
   }
 
-  analysisFolder := MakeAnalysisFolder(readFiles)
+  analysisFolder := MakeAnalysisFolder()
 
   //identify oraganism
   reference,LN := HandleReference()

@@ -11,7 +11,7 @@ import (
 
 func CheckError(err error) {
 	if err != nil {
-    fmt.Println("ERROR:")
+		fmt.Println("ERROR:")
 		fmt.Println(err)
 		os.Exit(1)
 	}
@@ -135,8 +135,8 @@ func MakeAnalysisFolder() string {
 }
 
 func DownloadDriver() {
-  download := CreateCommand("go get -u github.com/murlokswarm/mac")
-  RunCommand(download)
+	download := CreateCommand("go get -u github.com/murlokswarm/mac")
+	RunCommand(download)
 }
 
 func GetSampleData() []string {
@@ -169,11 +169,12 @@ func OnlyAlign(readFiles []string) string {
 	return samFile
 }
 
-func OnlyVCF(bamFiles []string) string{
-  reference,_ := HandleReference()
+func OnlyVCF(bamFiles []string) string {
+	reference, _ := HandleReference()
+
 	IndexReference(reference)
 
-  calledVCFFile := CallVariants(reference, bamFiles[0])
+	calledVCFFile := CallVariants(reference, bamFiles[0])
 
 	return calledVCFFile
 }
@@ -181,6 +182,12 @@ func OnlyVCF(bamFiles []string) string{
 func RunPipeline(readFiles []string) {
 	pairedEnd := (len(readFiles) == 2)
 	//get Filename reads()
+
+	if len(readFiles) == 0 {
+		//Use sample data
+		fmt.Println("ERROR: No files recieved. Please open a single end or paired end fastq file of tuberculosis")
+		return
+	}
 
 	reference, LN := HandleReference()
 	IndexReference(reference)

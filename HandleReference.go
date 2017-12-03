@@ -75,7 +75,7 @@ func ReferenceExists() (bool, string){
   return true, contents
 }
 
-func HandleReference(cwd string)  (string, int){
+func HandleReference()  (string, int){
   var reference string
   var LN int
   if exists,contents:= ReferenceExists(); exists {

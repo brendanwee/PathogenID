@@ -36,13 +36,13 @@ func CheckSamFile(samFile string , LN int) {
   }
 }
 
-func IndexReference(cwd,reference string) {
+func IndexReference(reference string) {
   //index genome
   bwaIndex := CreateCommand(cwd+"/bin/bwa index "+reference)
   RunCommand(bwaIndex)
 }
 
-func CheckBin(cwd string){
+func CheckBin(){
   cmd := "ls "+cwd+"/bin"
   lsBin:=CreateCommand(cmd)
   binContents := WriteOutputToString(lsBin)
@@ -52,7 +52,7 @@ func CheckBin(cwd string){
   }
 }
 
-func MakeBinExecutable(cwd string) {
+func MakeBinExecutable() {
   executables := []string{"bwa", "samtools", "bcftools"}
   for i:=0;i<len(executables);i++{
     fmt.Println("chmod 755 " + cwd+"/"+executables[i])
@@ -61,14 +61,14 @@ func MakeBinExecutable(cwd string) {
   }
 }
 
-func PrepareBin(cwd string){
-  CheckBin(cwd)
-  MakeBinExecutable(cwd)
+func PrepareBin(){
+  CheckBin()
+  MakeBinExecutable()
 }
 
 
 
-func MakeSamFile(cwd,reference string, numProcs, LN int, analysisFolder string, readFiles... string) string{
+func MakeSamFile(reference string, numProcs, LN int, analysisFolder string, readFiles... string) string{
   folders := strings.Split(strings.TrimSuffix(readFiles[0],".fastq"),"/")
   filename := folders[len(folders)-1]
   samFile := analysisFolder + filename+".sam"
@@ -83,65 +83,60 @@ func MakeSamFile(cwd,reference string, numProcs, LN int, analysisFolder string, 
   return samFile
 }
 
-func MakeBamFile(cwd, samFile string, numProcs int) string{
+func MakeBamFile( samFile string, numProcs int) string{
   samtoolsView := CreateCommand(cwd+"/bin/samtools view -@ " + strconv.Itoa(numProcs-1) + " -bS " + samFile)
   bamFile := strings.Split(samFile, ".")[0]+".bam"
   OutputCommandToFile(samtoolsView,bamFile)
   return bamFile
 }
 
-func SortBamFile(cwd, bamFile string, numProcs int) string {
+func SortBamFile(bamFile string, numProcs int) string {
   samtoolsSort:= CreateCommand(cwd+"/bin/samtools sort -@ " + strconv.Itoa(numProcs-1) + " " + bamFile)
   sortedBam := strings.Split(bamFile,".")[0]+".sorted.bam"
   OutputCommandToFile(samtoolsSort, sortedBam)
   return sortedBam
 }
 
-func AlignReads(cwd, reference string, readFiles []string, numProcs, LN int, pairedEnd bool, analysisFolder string) string{
+func AlignReads(reference string, readFiles []string, numProcs, LN int, pairedEnd bool, analysisFolder string) string{
   var samFile string
   if pairedEnd{
-    samFile = MakeSamFile(cwd,reference, numProcs, LN, analysisFolder, readFiles[0], readFiles[1])
+    samFile = MakeSamFile(reference, numProcs, LN, analysisFolder, readFiles[0], readFiles[1])
   } else {
-    samFile = MakeSamFile(cwd,reference, numProcs, LN, analysisFolder, readFiles[0])
+    samFile = MakeSamFile(reference, numProcs, LN, analysisFolder, readFiles[0])
   }
 
-  bamFile := MakeBamFile(cwd,samFile, numProcs)
-  sortedBam := SortBamFile(cwd, bamFile, numProcs)
+  bamFile := MakeBamFile(samFile, numProcs)
+  sortedBam := SortBamFile(bamFile, numProcs)
   return sortedBam
 }
 
-func MakeVCF(cwd, reference, sortedBam string)string {
+func MakeVCF(reference, sortedBam string)string {
   samtoolsMpileup:= CreateCommand(cwd+"/bin/samtools mpileup -v --reference "+reference+" "+sortedBam)
   vcfFile := strings.Split(sortedBam,".")[0]+".vcf"
   OutputCommandToFile(samtoolsMpileup, vcfFile)
   return vcfFile
 }
 
-func CallVCF(cwd, vcfFile string, numProcs int)string{
+func CallVCF(vcfFile string, numProcs int)string{
   bcfToolsCall := CreateCommand(cwd+"/bin/bcftools call --threads " + strconv.Itoa(numProcs-1) + " --ploidy 1 -c " + vcfFile)
   calledVCFFile := strings.Split(vcfFile,".")[0]+".called.vcf"
   OutputCommandToFile(bcfToolsCall, calledVCFFile)
   return calledVCFFile
 }
 
-func CallVariants(cwd, reference, sortedBam string, numProcs int) string{
-  vcfFile:= MakeVCF(cwd, reference, sortedBam)
-  calledVCFFile := CallVCF(cwd, vcfFile, numProcs)
+func CallVariants(reference, sortedBam string, numProcs int) string{
+  vcfFile:= MakeVCF(reference, sortedBam)
+  calledVCFFile := CallVCF(vcfFile, numProcs)
   return calledVCFFile
 }
 
-func MakeAnalysisFolder(readFiles []string) string{
-  folders := strings.Split(readFiles[0],"/")
-  dataLocation :=""
-  for i:=1;i<len(folders)-1;i++{
-    dataLocation = dataLocation+"/"+folders[i]
-  }
-  analysisFolder:=dataLocation+"/Analysis/"
+func MakeAnalysisFolder() string{
+  analysisFolder:=cwd+"/Analysis/"
   RunCommand(CreateCommand("mkdir "+analysisFolder))
   return analysisFolder
 }
 
-func GetSampleData(cwd string) []string{
+func GetSampleData() []string{
   path := cwd+"/SampleData/"
   var readFiles []string
   forward := UnzipFile(path+"test_data.fastq.gz")
@@ -153,17 +148,14 @@ func GetSampleData(cwd string) []string{
 
 func pwd()string{
   pwd:= CreateCommand("pwd")
-  cwd := WriteOutputToString(pwd)
-  return cwd
+  s := WriteOutputToString(pwd)
+  return s
 }
 
 func OnlyAlign(readFiles []string) string{
-  cwd := pwd()
-  PrepareBin(cwd)
-
   if len(readFiles)==0{
     //Use sample data
-    readFiles = GetSampleData(cwd)
+    readFiles = GetSampleData()
   }
 
   numProcs := runtime.NumCPU()
@@ -171,25 +163,23 @@ func OnlyAlign(readFiles []string) string{
     numProcs -= 1
   }
 
-  analysisFolder := MakeAnalysisFolder(readFiles)
+  analysisFolder := MakeAnalysisFolder()
 
   //identify oraganism
-  reference,LN := HandleReference(cwd)
-  IndexReference(cwd, reference)
+  reference,LN := HandleReference()
+  IndexReference(reference)
 
   var samFile string
   if len(readFiles)==2{
-    samFile = MakeSamFile(cwd,reference, numProcs, LN, analysisFolder, readFiles[0], readFiles[1])
+    samFile = MakeSamFile(reference, numProcs, LN, analysisFolder, readFiles[0], readFiles[1])
   } else {
-    samFile = MakeSamFile(cwd,reference, numProcs, LN, analysisFolder, readFiles[0])
+    samFile = MakeSamFile(reference, numProcs, LN, analysisFolder, readFiles[0])
   }
   return samFile
 }
 
 func RunPipeline(readFiles []string) {
-  pwd:= CreateCommand("pwd")
-  cwd := WriteOutputToString(pwd)
-  PrepareBin(cwd)
+  PrepareBin()
 
   numProcs := runtime.NumCPU()
   if numProcs >1 { //use all but one Processor just in case
@@ -200,17 +190,17 @@ func RunPipeline(readFiles []string) {
 
   if len(readFiles)==0{
     //Use sample data
-    readFiles = GetSampleData(cwd)
+    readFiles = GetSampleData()
   }
 
   analysisFolder := MakeAnalysisFolder(readFiles)
 
   //identify oraganism
-  reference,LN := HandleReference(cwd)
-  IndexReference(cwd, reference)
-  sortedBam:= AlignReads(cwd, reference, readFiles, numProcs, LN, pairedEnd, analysisFolder)
+  reference,LN := HandleReference()
+  IndexReference(analysis reference)
+  sortedBam:= AlignReads(reference, readFiles, numProcs, LN, pairedEnd, analysisFolder)
 
-  calledVCFFile := CallVariants(cwd, reference, sortedBam, numProcs)
+  calledVCFFile := CallVariants(reference, sortedBam, numProcs)
   fmt.Println(calledVCFFile, "Created")
 
   //ProcessVCF()

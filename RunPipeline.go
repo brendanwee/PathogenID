@@ -68,10 +68,10 @@ func PrepareBin(){
 
 
 
-func MakeSamFile(reference string, numProcs, LN int, analysisFolder string, readFiles... string) string{
+func MakeSamFile(reference string, numProcs, LN int, readFiles... string) string{
   folders := strings.Split(strings.TrimSuffix(readFiles[0],".fastq"),"/")
   filename := folders[len(folders)-1]
-  samFile := analysisFolder + filename+".sam"
+  samFile := outputPath + filename+".sam"
   var bwaMem *exec.Cmd
   if len(readFiles)==2{
     bwaMem = CreateCommand(cwd+"/bin/bwa mem -t " +strconv.Itoa(numProcs) + " " + reference + " " + readFiles[0] + " " + readFiles[1])
@@ -97,12 +97,12 @@ func SortBamFile(bamFile string, numProcs int) string {
   return sortedBam
 }
 
-func AlignReads(reference string, readFiles []string, numProcs, LN int, pairedEnd bool, analysisFolder string) string{
+func AlignReads(reference string, readFiles []string, numProcs, LN int, pairedEnd bool) string{
   var samFile string
   if pairedEnd{
-    samFile = MakeSamFile(reference, numProcs, LN, analysisFolder, readFiles[0], readFiles[1])
+    samFile = MakeSamFile(reference, numProcs, LN, readFiles[0], readFiles[1])
   } else {
-    samFile = MakeSamFile(reference, numProcs, LN, analysisFolder, readFiles[0])
+    samFile = MakeSamFile(reference, numProcs, LN, readFiles[0])
   }
 
   bamFile := MakeBamFile(samFile, numProcs)
@@ -163,7 +163,7 @@ func OnlyAlign(readFiles []string) string{
     numProcs -= 1
   }
 
-  analysisFolder := MakeAnalysisFolder()
+
 
   //identify oraganism
   reference,LN := HandleReference()
@@ -171,9 +171,9 @@ func OnlyAlign(readFiles []string) string{
 
   var samFile string
   if len(readFiles)==2{
-    samFile = MakeSamFile(reference, numProcs, LN, analysisFolder, readFiles[0], readFiles[1])
+    samFile = MakeSamFile(reference, numProcs, LN, readFiles[0], readFiles[1])
   } else {
-    samFile = MakeSamFile(reference, numProcs, LN, analysisFolder, readFiles[0])
+    samFile = MakeSamFile(reference, numProcs, LN, readFiles[0])
   }
   return samFile
 }
@@ -193,12 +193,10 @@ func RunPipeline(readFiles []string) {
     readFiles = GetSampleData()
   }
 
-  analysisFolder := MakeAnalysisFolder()
-
   //identify oraganism
   reference,LN := HandleReference()
   IndexReference(reference)
-  sortedBam:= AlignReads(reference, readFiles, numProcs, LN, pairedEnd, analysisFolder)
+  sortedBam:= AlignReads(reference, readFiles, numProcs, LN, pairedEnd)
 
   calledVCFFile := CallVariants(reference, sortedBam, numProcs)
   fmt.Println(calledVCFFile, "Created")

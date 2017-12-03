@@ -2,7 +2,7 @@ package main
 
 import (
 	"path/filepath"
-
+	"runtime"
 	"github.com/murlokswarm/app"
 	_ "github.com/murlokswarm/mac"
 )
@@ -20,11 +20,17 @@ var (
 	resistence   []string
 	pathogen     string
 	PathogenList = []string{"M. tuberculosis", "Staphylococcus aureus"} //A list of pathogens
+	numProcs     int
 )
 
 func main() {
+	numProcs := runtime.NumCPU()
+	if numProcs > 1 { //use all but one Processor just in case
+		numProcs -= 1
+	}
 	cwd = pwd()                       //  the current work directory
 	outputPath = MakeAnalysisFolder() // the directory of the result analysis folder
+	PrepareBin()
 
 	// OnLaunch is a handler which is called when the app is initialized and ready.
 	// The main window is created here.

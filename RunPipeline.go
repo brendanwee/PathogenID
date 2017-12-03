@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"runtime"
 	"strconv"
 	"strings"
 )
@@ -67,7 +66,7 @@ func PrepareBin() {
 	MakeBinExecutable()
 }
 
-func MakeSamFile(reference string, numProcs, LN int, readFiles ...string) string {
+func MakeSamFile(reference string, LN int, readFiles ...string) string {
 	folders := strings.Split(strings.TrimSuffix(readFiles[0], ".fastq"), "/")
 	filename := folders[len(folders)-1]
 	samFile := outputPath + filename + ".sam"
@@ -82,30 +81,30 @@ func MakeSamFile(reference string, numProcs, LN int, readFiles ...string) string
 	return samFile
 }
 
-func MakeBamFile(samFile string, numProcs int) string {
+func MakeBamFile(samFile string) string {
 	samtoolsView := CreateCommand(cwd + "/bin/samtools view -@ " + strconv.Itoa(numProcs-1) + " -bS " + samFile)
 	bamFile := strings.Split(samFile, ".")[0] + ".bam"
 	OutputCommandToFile(samtoolsView, bamFile)
 	return bamFile
 }
 
-func SortBamFile(bamFile string, numProcs int) string {
+func SortBamFile(bamFile string) string {
 	samtoolsSort := CreateCommand(cwd + "/bin/samtools sort -@ " + strconv.Itoa(numProcs-1) + " " + bamFile)
 	sortedBam := strings.Split(bamFile, ".")[0] + ".sorted.bam"
 	OutputCommandToFile(samtoolsSort, sortedBam)
 	return sortedBam
 }
 
-func AlignReads(reference string, readFiles []string, numProcs, LN int, pairedEnd bool) string {
+func AlignReads(reference string, readFiles []string, LN int, pairedEnd bool) string {
 	var samFile string
 	if pairedEnd {
-		samFile = MakeSamFile(reference, numProcs, LN, readFiles[0], readFiles[1])
+		samFile = MakeSamFile(reference, LN, readFiles[0], readFiles[1])
 	} else {
-		samFile = MakeSamFile(reference, numProcs, LN, readFiles[0])
+		samFile = MakeSamFile(reference, LN, readFiles[0])
 	}
 
-	bamFile := MakeBamFile(samFile, numProcs)
-	sortedBam := SortBamFile(bamFile, numProcs)
+	bamFile := MakeBamFile(samFile)
+	sortedBam := SortBamFile(bamFile)
 	return sortedBam
 }
 
@@ -116,16 +115,16 @@ func MakeVCF(reference, sortedBam string) string {
 	return vcfFile
 }
 
-func CallVCF(vcfFile string, numProcs int) string {
+func CallVCF(vcfFile string) string {
 	bcfToolsCall := CreateCommand(cwd + "/bin/bcftools call --threads " + strconv.Itoa(numProcs-1) + " --ploidy 1 -c " + vcfFile)
 	calledVCFFile := strings.Split(vcfFile, ".")[0] + ".called.vcf"
 	OutputCommandToFile(bcfToolsCall, calledVCFFile)
 	return calledVCFFile
 }
 
-func CallVariants(reference, sortedBam string, numProcs int) string {
+func CallVariants(reference, sortedBam string) string {
 	vcfFile := MakeVCF(reference, sortedBam)
-	calledVCFFile := CallVCF(vcfFile, numProcs)
+	calledVCFFile := CallVCF(vcfFile)
 	return calledVCFFile
 }
 
@@ -157,50 +156,48 @@ func pwd() string {
 }
 
 func OnlyAlign(readFiles []string) string {
-	if len(readFiles) == 0 {
-		//Use sample data
-		readFiles = GetSampleData()
-	}
-
-	numProcs := runtime.NumCPU()
-	if numProcs > 1 { //use all but one Processor just in case
-		numProcs -= 1
-	}
-
 	//identify oraganism
 	reference, LN := HandleReference()
 	IndexReference(reference)
 
 	var samFile string
 	if len(readFiles) == 2 {
-		samFile = MakeSamFile(reference, numProcs, LN, readFiles[0], readFiles[1])
+		samFile = MakeSamFile(reference, LN, readFiles[0], readFiles[1])
 	} else {
-		samFile = MakeSamFile(reference, numProcs, LN, readFiles[0])
+		samFile = MakeSamFile(reference, LN, readFiles[0])
 	}
 	return samFile
 }
 
-func RunPipeline(readFiles []string) {
-	PrepareBin()
+func OnlyVCF(bamFiles []string){
+  if len(bamFiles) == 0 {
+    //Use sample data
+    fmt.Println("ERROR: No files recieved. Please open a sorted bam file of tuberculosis")
+    return
+  }
+  reference,_ := HandleReference()
+	IndexReference(reference)
+  for i := range(bamFiles){
+    calledVCFFile := CallVariants(reference, bamFiles[i])
+    vcf = append(vcf,calledVCFFile)
+  }
+}
 
-	numProcs := runtime.NumCPU()
-	if numProcs > 1 { //use all but one Processor just in case
-		numProcs -= 1
-	}
+func RunPipeline(readFiles []string) {
 	pairedEnd := (len(readFiles) == 2)
 	//get Filename reads()
 
 	if len(readFiles) == 0 {
 		//Use sample data
-		readFiles = GetSampleData()
+		fmt.Println("ERROR: No files recieved. Please open a single end or paired end fastq file of tuberculosis")
+    return
 	}
 
-	//identify oraganism
 	reference, LN := HandleReference()
 	IndexReference(reference)
-	sortedBam := AlignReads(reference, readFiles, numProcs, LN, pairedEnd)
+	sortedBam := AlignReads(reference, readFiles, LN, pairedEnd)
 
-	calledVCFFile := CallVariants(reference, sortedBam, numProcs)
+	calledVCFFile := CallVariants(reference, sortedBam)
 	fmt.Println(calledVCFFile, "Created")
 
 	//ProcessVCF()

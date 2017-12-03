@@ -46,6 +46,7 @@ func (g *Graph) Render() string {
 	`
 }
 
+// newSubWindow creates a new window to display the plots
 func newSubWindow() app.Contexter {
 	// Creates a window context.
 	subwin := app.NewWindow(app.Window{
@@ -72,6 +73,7 @@ func newSubWindow() app.Contexter {
 	return subwin
 }
 
+//
 func (f *FileSummary) OnFastqButtonClick() {
 	f.Output = "Fastq summay present here!"
 	app.Render(f)           // Tells the app to update the rendering of the component.

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"math"
 )
 
 var filename string
@@ -18,40 +19,71 @@ func WriteResult(allDrug []Drug) string {
 	}
 	defer resultFile.Close()
 
-	
+
 	// Write data to files.
 	//fmt.Fprintln(resultFile, headerLine) // Print the order of the chain.
 	// Write the result.
-	var drugName string
 	var geneName string
 	var mutationLine string
-	var description string
+	fmt.Fprintln(resultFile,"DRUG\tGENE\tPOS\tAA\tCOD\tCONF\tDESC")
 	for i := range allDrug {
-		// Write the drug name
-		drugName = allDrug[i].name
-		fmt.Fprintln(resultFile, drugName)
-		for j := range allDrug[i].resistance {
-			// Write the resistant gene name
-			if len(allDrug[i].resistance[j].mutations) != 0 {
-				for k := range allDrug[i].resistance[j].mutations {
-					if allDrug[i].resistance[j].mutations[k].resistance == true {
-						geneName = allDrug[i].resistance[j].name
-						fmt.Fprint(resultFile, geneName+"\t")
-						// write each mutation and its properties
-						description = allDrug[i].resistance[j].mutations[k].refAA.name + "(" + allDrug[i].resistance[j].mutations[k].refAA.polarity + ", " +
-							strconv.Itoa(allDrug[i].resistance[j].mutations[k].refAA.charge) + ") " +
-							"to " + allDrug[i].resistance[j].mutations[k].altAA.name + "(" + allDrug[i].resistance[j].mutations[k].altAA.polarity + ", " +
-							strconv.Itoa(allDrug[i].resistance[j].mutations[k].altAA.charge) + ") "
-						mutationLine = strconv.Itoa(allDrug[i].resistance[j].mutations[k].Pos) + "\t" +
-							allDrug[i].resistance[j].mutations[k].refAA.name + "->" + allDrug[i].resistance[j].mutations[k].altAA.name + "\t" +
-							allDrug[i].resistance[j].mutations[k].refCodon + "->" + allDrug[i].resistance[j].mutations[k].altCodon + "\t" +
-							strconv.FormatFloat(allDrug[i].resistance[j].mutations[k].confidence, 'E', -1, 32) + "\t" + description
-						fmt.Fprintln(resultFile, mutationLine)
-					}
+		for j := range allDrug[i].resistance { //for each gene associated with the drug
+			for k := range allDrug[i].resistance[j].mutations { //for each mutation
+				if allDrug[i].resistance[j].mutations[k].resistance == true {// if the mutation codes for resistance
+					mutationLine = ""
+					DRUG := GetFullName(allDrug[i].name)
+					geneName = allDrug[i].resistance[j].name
+					POS := strconv.Itoa(allDrug[i].resistance[j].mutations[k].Pos)
+					AA := allDrug[i].resistance[j].mutations[k].refAA.name + " -> " + allDrug[i].resistance[j].mutations[k].altAA.name
+					refPol :=allDrug[i].resistance[j].mutations[k].refAA.polarity
+					altPol := allDrug[i].resistance[j].mutations[k].altAA.polarity
+					refCharge :=ConvertCharge(allDrug[i].resistance[j].mutations[k].refAA.charge)
+					altCharge :=ConvertCharge(allDrug[i].resistance[j].mutations[k].altAA.charge)
+					COD := allDrug[i].resistance[j].mutations[k].refCodon + "->" + allDrug[i].resistance[j].mutations[k].altCodon + "\t"
+					CONF := strconv.FormatFloat(math.Log10((allDrug[i].resistance[j].mutations[k].confidence/10)),'f',2,64)
+					DESC := "The change from a "+refPol+" "+refCharge+ " charged amino acid to a "+ altPol + " " + altCharge + " charged amino acid may affect this proteins susceptibility to "+DRUG+
+					". We are "+CONF+"'%' sure this mutation is real."
+					mutationLine = mutationLine + DRUG+"\t"+geneName+"\t"+POS+"\t"+AA+"\t"+COD+"\t"+CONF+"\t"+DESC
+					fmt.Fprintln(resultFile,mutationLine)
 				}
 			}
 		}
 	}
 	//return cwd+"/Analysis/Results/DrugResistance.txt"
 	return "Hi"
+}
+
+
+func GetFullName(abv string) string {
+	switch abv{
+	case "RIF":
+		return "Rifampin"
+	case "INH":
+		return "Isoniazid"
+	case "PZA":
+		return "Pyrazinamide"
+	case "SM":
+		return "Streptomycin"
+	case "AMI":
+		return "Aminoglycosides"
+	case "EMB":
+		return "Ethambutol"
+	case "ETH":
+		return "Ethionamide"
+	case "FLQ":
+		return "Fluoroquinolones"
+	case "PAS":
+		return "Para-Aminosalicylic Acid"
 	}
+	return ""
+}
+
+func ConvertCharge(i int)string{
+	if i>0{
+		return "positively"
+	} else if i<0{
+		return "negatively"
+	} else {
+		return "nuetrally"
+	}
+}

@@ -11,12 +11,6 @@ import (
 	"math/rand"
 )
 
-//global variable
-
-
-
-
-
 //store mutations as a struct
 type Mutation struct {
 	refSeq     string
@@ -229,13 +223,13 @@ func MoveRightToBoundary(mutant MutationFile, i int, boundary [2]int) int{
 	return i-1
 }
 
-//maybe exist problem
+//maybe exist problem. NOT ANYMORE! >:()
 func SearchMutant(mutant MutationFile, boundary [2]int) (int,bool) {
 	now := 0
 	low, high := 0, len(mutant)-1
 	first := true
 	var movedRight bool
-	for low <= high { 
+	for low <= high {
 		now = (low + high) >> 1
 		side := inBounds(mutant[now].Pos,boundary)
 		switch side {

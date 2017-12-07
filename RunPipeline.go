@@ -180,7 +180,7 @@ func OnlyVCF(bamFiles []string) string{
 	IndexReference(reference)
 
   calledVCFFile := CallVariants(reference, bamFiles[0])
-
+	PredictResistance(reference,calledVCFFile)
 	return calledVCFFile
 }
 

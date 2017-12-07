@@ -1,7 +1,0 @@
-INH
-iniB
-Mutation Genes Position	Amino Acid Changes	Codon Changes	Confidence	description
-409701	val->phe	CAG->AAG	9.51895E+00	valtophe
-katG
-Mutation Genes Position	Amino Acid Changes	Codon Changes	Confidence	description
-2155168	arg->pro	GCT->GGT	9.51895E+00	argtopro

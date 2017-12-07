@@ -59,10 +59,10 @@ func CheckForAdapters(adapterMap map[adapter]int, sequence string){
   }
 }
 
-func PrintReadLengthsGraph(prefix string, readLengths []int){
-  lengths := make(plotter.Values, len(readLengths))
-	for i :=0; i< len(readLengths); i++ {
-		lengths[i] = float64(readLengths[i])
+func MakeHistogram(prefix, title string, data []int){
+  lengths := make(plotter.Values, len(data))
+	for i :=0; i< len(data); i++ {
+		lengths[i] = float64(data[i])
 	}
   graph,err := plot.New()
   CheckError(err)
@@ -70,7 +70,7 @@ func PrintReadLengthsGraph(prefix string, readLengths []int){
   histogram, err := plotter.NewHist(lengths,16)
   CheckError(err)
   graph.Add(histogram)
-  graph.Save(4*vg.Inch, 4*vg.Inch, prefix+"ReadLengths.png")
+  graph.Save(4*vg.Inch, 4*vg.Inch, prefix+title+".png")
 
 }
 
@@ -133,8 +133,8 @@ func DrawAdapterContent(adapterMap map[adapter]int, prefix string){
 
 
 func FastDetails(readFiles []string) string{
-  MakeFolder("Analysis/Fastq_Plots")
-  prefix := cwd+"/Analysis/Fastq_Plots/"
+  MakeFolder("resources/Fastq_Plots")
+  prefix := cwd+"/resources/Fastq_Plots/"
   MakeAdapterMap()
   adapterMap := MakeAdapterMap()
   var G int
@@ -182,7 +182,7 @@ func FastDetails(readFiles []string) string{
 `Average Read Quality: ` + strconv.FormatFloat(averageReadQuality,'f',2,64) +`$#13;$#10;` +
 `Average Read Length: ` + strconv.FormatFloat(averageReadLengths,'f',2,64) + `$#13;$#10;` +
 `Analyzed ` + strconv.Itoa(numReads) + `reads`
-  PrintReadLengthsGraph(prefix,readLengths)
+  MakeHistogram(prefix,"readlengths",readLengths)
   DrawBaseContentGraph(gContent,cContent,tContent,aContent,prefix)
   DrawAdapterContent(adapterMap,prefix)
   return output

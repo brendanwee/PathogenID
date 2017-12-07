@@ -21,7 +21,7 @@ func SamDetails(samFile string)string{
 }
 
 func ReadSamFile(samFile string) (int, []int, []int){
-  file,err := os.Open("Analysis/poop.txt")
+  file,err := os.Open("Analysis/"+samFile)
   qualities := make([]int,0)
   baseLocations := make([]int,0)
   reads := 0

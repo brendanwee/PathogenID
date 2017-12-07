@@ -5,6 +5,10 @@ import(
   "bufio"
   "strings"
   "os"
+  "gonum.org/v1/plot"
+	"gonum.org/v1/plot/plotter"
+  "gonum.org/v1/plot/plotutil"
+	"gonum.org/v1/plot/vg"
 )
 
 type adapter [2]string //name then sequence
@@ -55,40 +59,79 @@ func CheckForAdapters(adapterMap map[adapter]int, sequence string){
   }
 }
 
-func PrintReadLengthsGraph(readLengths []int){
-  /*categories := make(map[int]int)
-  categories[50]=0
-  categories[100]=0
-  categories[150]=0
-  for i:=0;i<23;i++{
-    if n<8 {
-      cat := 200+100*n
-    } else if n<18 {
-      cat := 1000+1000*(n-8)
-    } else if n<20 {
-      cat := 15000+5000*(n-18)
-    } else {
-      cat := 30000 + 10000*(n-20)
-    }
-    categories[cat] = 0
-  }
-  AssignCategory(categories, readLengths)
-  prevKey := 0
-  for key, value := range(categories){
-    fmt.Println(prevKey,"-", key,"=", value)
-    prevKey = key
-  }*/
+func PrintReadLengthsGraph(prefix string, readLengths []int){
+  lengths := make(plotter.Values, len(readLengths))
+	for i :=0; i< len(readLengths); i++ {
+		lengths[i] = float64(readLengths[i])
+	}
+  graph,err := plot.New()
+  CheckError(err)
+  graph.Title.Text= "Read Lengths"
+  histogram, err := plotter.NewHist(lengths,16)
+  CheckError(err)
+  graph.Add(histogram)
+  graph.Save(4*vg.Inch, 4*vg.Inch, prefix+"ReadLengths.png")
 
 }
-/*
-func AssignCategory(categories map[int]int, readlengths){
-  for i:=0; i<len(readLengths);i++{
-    if len(line) < key :
-      categories[key] = value + 1
-      break
-  }
+
+func DrawBaseContentGraph(gContent, cContent, tContent, aContent float64, prefix string){
+  plot,err := plot.New()
+  CheckError(err)
+  plot.Title.Text = "Base Content"
+	plot.Y.Label.Text = "Percent"
+  width := vg.Points(40)
+  gData := plotter.Values{gContent}
+  cData := plotter.Values{cContent}
+  tData := plotter.Values{tContent}
+  aData := plotter.Values{aContent}
+  gBar, err := plotter.NewBarChart(gData, width)
+  CheckError(err)
+  cBar, err := plotter.NewBarChart(cData, width)
+  CheckError(err)
+  tBar, err := plotter.NewBarChart(tData, width)
+  CheckError(err)
+  aBar,err := plotter.NewBarChart(aData, width)
+  CheckError(err)
+  gBar.Offset= -1.5*width-4
+  cBar.Offset= -.5*width-2
+  tBar.Offset= .5*width+2
+  aBar.Offset= 1.5*width+4
+  gBar.Color= plotutil.Color(0)
+  cBar.Color= plotutil.Color(1)
+  tBar.Color= plotutil.Color(2)
+  aBar.Color= plotutil.Color(3)
+  plot.Add(gBar,cBar,tBar, aBar)
+  plot.Legend.Add("G", gBar)
+  plot.Legend.Add("C", cBar)
+  plot.Legend.Add("T", tBar)
+  plot.Legend.Add("A", aBar)
+  plot.Legend.Top = true
+  plot.Save(4*vg.Inch, 4*vg.Inch, prefix+"BaseContent.png")
 }
-*/
+
+func DrawAdapterContent(adapterMap map[adapter]int, prefix string){
+  plot,err := plot.New()
+  CheckError(err)
+  plot.Title.Text = "Adapter Content"
+	plot.Y.Label.Text = "Reads"
+  width := vg.Points(15)
+  i :=0
+  for adpt, count := range(adapterMap){
+    numReads := plotter.Values{float64(count)}
+    adapterBar, err := plotter.NewBarChart(numReads, width)
+    CheckError(err)
+    offset :=vg.Points(-(23./2.)+.5+float64(i))
+    adapterBar.Offset= offset*width
+    adapterBar.Color= plotutil.Color(i)
+    plot.Add(adapterBar)
+    plot.Legend.Add(adpt[0], adapterBar)
+    i++
+  }
+  plot.Save(8*vg.Inch, 4*vg.Inch, prefix+"AdapterContent.png")
+
+}
+
+
 func FastDetails(readFiles... string) {
   MakeAdapterMap()
   adapterMap := MakeAdapterMap()
@@ -138,5 +181,7 @@ func FastDetails(readFiles... string) {
   fmt.Println("Average Read Quality:", averageReadQuality)
   fmt.Println("Average Read Length:", averageReadLengths)
   fmt.Println( "Analyzed", len(readLengths), "reads")
-  //PrintReadLengthsGraph(readLengths)
+  PrintReadLengthsGraph(strings.Split(readFiles[0],".")[0],readLengths)
+  DrawBaseContentGraph(gContent,cContent,tContent,aContent,strings.Split(readFiles[0],".")[0])
+  DrawAdapterContent(adapterMap,strings.Split(readFiles[0],".")[0])
 }

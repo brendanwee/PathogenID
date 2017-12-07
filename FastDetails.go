@@ -1,9 +1,9 @@
 package main
 
 import(
-  "fmt"
   "bufio"
   "strings"
+  "strconv"
   "os"
   "gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
@@ -132,7 +132,9 @@ func DrawAdapterContent(adapterMap map[adapter]int, prefix string){
 }
 
 
-func FastDetails(readFiles... string) {
+func FastDetails(readFiles []string) string{
+  MakeFolder("Analysis/Fastq_Plots")
+  prefix := cwd+"/Analysis/Fastq_Plots/"
   MakeAdapterMap()
   adapterMap := MakeAdapterMap()
   var G int
@@ -167,21 +169,21 @@ func FastDetails(readFiles... string) {
         CountBases(&G,&A,&C,&T, scanner.Text())
       }
     }
-
   }
   totalBases := G+C+A+T
-  gContent := float64(G)/float64(totalBases)*100
-  cContent := float64(C)/float64(totalBases)*100
-  aContent := float64(A)/float64(totalBases)*100
-  tContent := float64(T)/float64(totalBases)*100
+  gContent:= float64(G)/float64(totalBases)*100
+  cContent:= float64(C)/float64(totalBases)*100
+  aContent:= float64(A)/float64(totalBases)*100
+  tContent:= float64(T)/float64(totalBases)*100
   averageReadQuality := float64(qualitySum)/float64(totalBases)
   averageReadLengths := float64(totalBases)/float64(numReads)
-  fmt.Println("G/C Content: G:", gContent, "C:", cContent)
-  fmt.Println("Per Base Sequnce Content: G:", gContent, "C:", cContent, "A:", aContent, "T:", tContent)
-  fmt.Println("Average Read Quality:", averageReadQuality)
-  fmt.Println("Average Read Length:", averageReadLengths)
-  fmt.Println( "Analyzed", len(readLengths), "reads")
-  PrintReadLengthsGraph(strings.Split(readFiles[0],".")[0],readLengths)
-  DrawBaseContentGraph(gContent,cContent,tContent,aContent,strings.Split(readFiles[0],".")[0])
-  DrawAdapterContent(adapterMap,strings.Split(readFiles[0],".")[0])
+  output := `G/C Content: G: `+ strconv.FormatFloat(gContent,'f',2,64) + ` C: ` + strconv.FormatFloat(cContent,'f',2,64)+ `&#13;&#10;`+
+`Per Base Sequnce Content: G: ` + strconv.FormatFloat(gContent,'f',2,64) + ` C: ` + strconv.FormatFloat(cContent,'f',2,64) + ` A: ` + strconv.FormatFloat(aContent,'f',2,64) + ` T: ` + strconv.FormatFloat(tContent,'f',2,64) + `$#13;$#10;` +
+`Average Read Quality: ` + strconv.FormatFloat(averageReadQuality,'f',2,64) +`$#13;$#10;` +
+`Average Read Length: ` + strconv.FormatFloat(averageReadLengths,'f',2,64) + `$#13;$#10;` +
+`Analyzed ` + strconv.Itoa(numReads) + `reads`
+  PrintReadLengthsGraph(prefix,readLengths)
+  DrawBaseContentGraph(gContent,cContent,tContent,aContent,prefix)
+  DrawAdapterContent(adapterMap,prefix)
+  return output
 }

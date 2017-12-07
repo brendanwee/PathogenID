@@ -7,7 +7,7 @@ import (
 )
 
 var filename string
-MakeFolder("Analysis/Results")
+//MakeFolder("Analysis/Results")
 func WriteResult(allDrug []Drug) string {
 	filename = "/Analysis/Results/DrugResistance.txt"
 	// Create a new empty sam file.

@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-//TODO: handle path so that there are no spaces 
+//TODO: handle path so that there are no spaces
 
 func CheckError(err error) {
 	if err != nil {
@@ -130,8 +130,8 @@ func CallVariants(reference, sortedBam string) string {
 	return calledVCFFile
 }
 
-func MakeAnalysisFolder() string {
-	analysisFolder := cwd + "/Analysis/"
+func MakeFolder(name string) string {
+	analysisFolder := cwd + "/"+name+"/"
 	RunCommand(CreateCommand("mkdir " + analysisFolder))
 	return analysisFolder
 }
@@ -182,19 +182,7 @@ func OnlyVCF(bamFiles []string) string{
 }
 
 func RunPipeline(readFiles []string) {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-	if len(readFiles) == 0 {
-=======
 	if len(readFiles) ==0{
->>>>>>> 8e1b3df6f20f824b0894ddff973711a7d07bf5d1
-=======
-	if len(readFiles ==0){
->>>>>>> parent of d8f9c39... UI update
-=======
-	if len(readFiles) ==0{
->>>>>>> 8e1b3df6f20f824b0894ddff973711a7d07bf5d1
 		fmt.Println("No files recieved")
 		return
 	}

@@ -29,7 +29,7 @@ func main() {
 		numProcs -= 1
 	}
 	cwd = pwd()                       //  the current work directory
-	outputPath = MakeAnalysisFolder() // the directory of the result analysis folder
+	outputPath = MakeFolder("Analysis") // the directory of the result analysis folder
 	PrepareBin()
 
 	// OnLaunch is a handler which is called when the app is initialized and ready.

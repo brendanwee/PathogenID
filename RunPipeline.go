@@ -9,6 +9,8 @@ import (
 	"strings"
 )
 
+//TODO: handle path so that there are no spaces 
+
 func CheckError(err error) {
 	if err != nil {
     fmt.Println("ERROR:")
@@ -180,7 +182,7 @@ func OnlyVCF(bamFiles []string) string{
 }
 
 func RunPipeline(readFiles []string) {
-	if len(readFiles ==0){
+	if len(readFiles) ==0{
 		fmt.Println("No files recieved")
 		return
 	}

@@ -124,7 +124,7 @@ func (h *AnalyzeButton) OnClinicalButtonClick() {
 		h.Info = "Running... Please wait patiently for jumping. This may take a few minutes"
 		app.Render(h)
 		/*
-			txtFile := ClinicalAnaylisis(*files)// function that analyzes the .vcf file
+			txtFile := ClinicalAnaylisis(vcf[0])// function that analyzes the .vcf file
 			resistence = append(resistence, txtFile) // append txt file to the list
 		*/
 		fileSummary := &FileSummary{} // Creates a FileSummary component

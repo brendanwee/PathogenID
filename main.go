@@ -3,6 +3,7 @@ package main
 import (
 	"path/filepath"
 	"runtime"
+
 	"github.com/murlokswarm/app"
 	_ "github.com/murlokswarm/mac"
 )
@@ -28,7 +29,7 @@ func main() {
 	if numProcs > 1 { //use all but one Processor just in case
 		numProcs -= 1
 	}
-	cwd = pwd()                       //  the current work directory
+	cwd = pwd()                         //  the current work directory
 	outputPath = MakeFolder("Analysis") // the directory of the result analysis folder
 	PrepareBin()
 

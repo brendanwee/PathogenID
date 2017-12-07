@@ -32,7 +32,7 @@ func ReadSamFile(samFile string) (int, []int, []int){
     reads += 1
     alignedRead := strings.Split(scanner.Text(),"\t")
     bases := make([]int,len(alignedRead[9]))
-    pos, err := strconv.Atoi(alignedRead[9])
+    pos, err := strconv.Atoi(alignedRead[3])
     CheckError(err)
     for i := range(bases){
       bases[i] = pos+i

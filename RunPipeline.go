@@ -184,6 +184,7 @@ func OnlyVCF(bamFiles []string) string{
 func RunPipeline(readFiles []string) {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 	if len(readFiles) == 0 {
 =======
 	if len(readFiles) ==0{
@@ -191,6 +192,9 @@ func RunPipeline(readFiles []string) {
 =======
 	if len(readFiles ==0){
 >>>>>>> parent of d8f9c39... UI update
+=======
+	if len(readFiles) ==0{
+>>>>>>> 8e1b3df6f20f824b0894ddff973711a7d07bf5d1
 		fmt.Println("No files recieved")
 		return
 	}

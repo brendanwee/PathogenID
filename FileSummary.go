@@ -128,6 +128,22 @@ func (f *FileSummary) OnResistenceButtonClick() {
 		f.Output = "There's no result files. &#13;&#10; Please use Ctrl + O to open up .txt result files"
 		app.Render(f) // Tells the app to update the rendering of the component.
 	} else {
+		/*subwin := app.NewWindow(app.Window{
+			Title:          "Pathogen ID",
+			Width:          640,
+			Height:         360,
+			TitlebarHidden: true,
+			MinimizeHidden: false,
+			OnClose: func() bool {
+				subWin = nil
+				return true
+			},
+		})
+		table := &FinalTable{}   // Creates a Hello component.
+		subwin.Mount(table) // Mounts the Hello component into the window context.
+		// graph.Figure = "profile-pictures/logo.png" // parse the source of the image
+
+		app.Render(table)*/
 		f.Output = "Fastq summay present here!  &#13;&#10; We can start a new line here too."
 		app.Render(f)           // Tells the app to update the rendering of the component.
 		subWin = newSubWindow() // Pop up a new window for the graph display

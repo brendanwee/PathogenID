@@ -51,7 +51,6 @@ func MD5(filename string) string {
   CheckError(err)
   scanner := bufio.NewScanner(file)
   scanner.Scan()
-  fmt.Println(scanner.Text())
   md5Text := strings.Split(scanner.Text(), " ")[3]
   return md5Text
 }
@@ -67,9 +66,7 @@ func DownloadReference() string{
 }
 
 func ReferenceExists() (bool, string){
-  fmt.Println(outputPath)
   ls:=exec.Command("ls "+outputPath)
-  fmt.Println("here")
   contents,_ := ls.Output()
   if !strings.Contains(string(contents), "Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa"){
     return false, ""

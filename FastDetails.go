@@ -1,6 +1,7 @@
 package main
 
 import(
+  "fmt"
   "bufio"
   "strings"
   "strconv"
@@ -27,6 +28,7 @@ func MakeAdapterMap() map[adapter]int {
       adapterMap[a]=0
     }
   }
+  adapterFile.Close()
   return adapterMap
 }
 
@@ -45,10 +47,13 @@ func CountBases(G,A,C,T *int, sequence string){
   }
 }
 
-func SumQScore(sum *int, qscore string){
+func SumQScore(sum *int, qscore string) []int{
+  var q []int
   for i:=0;i<len(qscore);i++{
+    q = append(q,int(qscore[i])-32)
     *sum += int(qscore[i])-32
   }
+  return q
 }
 
 func CheckForAdapters(adapterMap map[adapter]int, sequence string){
@@ -66,11 +71,12 @@ func MakeHistogram(prefix, title string, data []int){
 	}
   graph,err := plot.New()
   CheckError(err)
-  graph.Title.Text= "Read Lengths"
+  graph.Title.Text= title
   histogram, err := plotter.NewHist(lengths,16)
   CheckError(err)
   graph.Add(histogram)
-  graph.Save(4*vg.Inch, 4*vg.Inch, prefix+title+".png")
+  fmt.Println("Saved ", "/"+prefix+"/"+title+".png")
+  graph.Save(4*vg.Inch, 4*vg.Inch, "/"+prefix+"/"+title+".png")
 
 }
 
@@ -133,7 +139,6 @@ func DrawAdapterContent(adapterMap map[adapter]int, prefix string){
 
 
 func FastDetails(readFiles []string) string{
-  MakeFolder("resources/Fastq_Plots")
   prefix := cwd+"/resources/Fastq_Plots/"
   MakeAdapterMap()
   adapterMap := MakeAdapterMap()
@@ -144,6 +149,7 @@ func FastDetails(readFiles []string) string{
   var qualitySum int
   var numReads int
   var readLengths []int
+  var qScores []int
 
   for i:=0; i<len(readFiles);i++{
     reads,err:= os.Open(readFiles[i])
@@ -161,7 +167,8 @@ func FastDetails(readFiles []string) string{
         CountBases(&G,&A,&C,&T, scanner.Text())
         scanner.Scan()//+
         scanner.Scan()//qscore
-        SumQScore(&qualitySum, scanner.Text())
+
+        qScores = append(qScores,SumQScore(&qualitySum, scanner.Text())...)
       } else if scanner.Text()[0]=='>'{
         numReads++
         scanner.Scan()
@@ -169,6 +176,7 @@ func FastDetails(readFiles []string) string{
         CountBases(&G,&A,&C,&T, scanner.Text())
       }
     }
+    reads.Close()
   }
   totalBases := G+C+A+T
   gContent:= float64(G)/float64(totalBases)*100
@@ -183,6 +191,7 @@ func FastDetails(readFiles []string) string{
 `Average Read Length: ` + strconv.FormatFloat(averageReadLengths,'f',2,64) + `$#13;$#10;` +
 `Analyzed ` + strconv.Itoa(numReads) + `reads`
   MakeHistogram(prefix,"readlengths",readLengths)
+  MakeHistogram(prefix,"Quality Scores of Raw Reads", qScores)
   DrawBaseContentGraph(gContent,cContent,tContent,aContent,prefix)
   DrawAdapterContent(adapterMap,prefix)
   return output

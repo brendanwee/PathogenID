@@ -13,9 +13,6 @@ import (
 
 //global variable
 
-var fbpC, Rv0340, iniB, iniA, iniC, mabA, inhA, Rv1592c, Rv1772, ndh, katG, furA, srmR, fabD, kasA, accD6, oxyR, aphC, efpA, fadE24, nhoA Gene
-
-var pncA, rpsL, rrs, gidB, rpoB, embB, tlyA, embR, Rv3124, Rv3125c, Rv3264c, Rv3266c, embC, embA, ethA, gyrB, gyrA, thyA Gene
 
 
 
@@ -42,8 +39,6 @@ type Gene struct {
 	drug        []string
 }
 
-var allGenes []Gene
-
 func (gene Gene) PrintMutation() {
 	for i := range gene.mutations {
 		fmt.Println("Mutation:", gene.mutations[i])
@@ -69,14 +64,11 @@ type Drug struct {
 	resistance []Gene
 }
 
-var RIF, INH, PZA, SM, AMI, EMB, ETH, FLQ, PAS Drug
-var allDrug []Drug
-var allMutant MutationFile
 
 //main
 func ShowMutation(vcfName string) {
 	vcfLines := ReadVcf(vcfName)
-	allMutant = SpiltVcf(vcfLines)
+	allMutant = SplitVcf(vcfLines)
 	InitializeGene()
 	InitializeDrug()
 	allMutant = FilterMutaions(allMutant)
@@ -175,7 +167,7 @@ func ReadVcf(vcfName string) []string {
 }
 
 //spilt the lines using \t and trun into Mutation
-func SpiltVcf(vcfLines []string) MutationFile {
+func SplitVcf(vcfLines []string) MutationFile {
 
 	for i := range vcfLines {
 		if vcfLines[i][0] == '#' {
@@ -204,32 +196,65 @@ func SpiltVcf(vcfLines []string) MutationFile {
 
 func GenesMutation(gene Gene, mutant MutationFile) Gene {
 	//Search gene location
-	startMutant := SearchMutant(mutant, gene.boundary[0])
-
-	for i := startMutant; mutant[i].Pos <= gene.boundary[1]; i++ {
-		gene.mutations = append(gene.mutations, mutant[i])
+	startMutant, movedRight := SearchMutant(mutant, gene.boundary)
+	if startMutant>=len(mutant){
+		return gene
 	}
-
+	if movedRight { //keep moving right, or larger
+		for i := startMutant; mutant[i].Pos > gene.boundary[1]; i++{
+			gene.mutations = append(gene.mutations, mutant[i])
+		}
+	} else {
+		for i := startMutant; mutant[i].Pos > gene.boundary[0]; i-- {
+			gene.mutations = append(gene.mutations, mutant[i])
+		}
+	}
 	return gene
 }
 
+func inBounds(i int, boundary [2]int) int{
+	if i>boundary[1]{
+		return 2
+	} else if i<boundary[0]{
+		return 0
+	} else {
+		return 1
+	}
+}
+
+func MoveRightToBoundary(mutant MutationFile, i int, boundary [2]int) int{
+	for mutant[i].Pos < boundary[1]{
+		i += 1
+	}
+	return i-1
+}
+
 //maybe exist problem
-func SearchMutant(mutant MutationFile, k int) int {
+func SearchMutant(mutant MutationFile, boundary [2]int) (int,bool) {
 	now := 0
 	low, high := 0, len(mutant)-1
-	for low <= high {
+	first := true
+	var movedRight bool
+	for low <= high { 
 		now = (low + high) >> 1
-
-		if mutant[now].Pos < k {
-			low = now + 1
-		} else if mutant[now].Pos > k {
-			high = now - 1
-		} else {
-			return now
+		side := inBounds(mutant[now].Pos,boundary)
+		switch side {
+			case 0: //left
+				low = now+1
+				movedRight =true
+			case 1: //inside!
+				if first{
+					now = MoveRightToBoundary(mutant,now, boundary)
+					movedRight = true
+				}
+				return now, movedRight
+			case 2:
+				high = now-1
+				movedRight = false
+			default:
+				fmt.Println("ERROR: somehow, i is not greater, larger, or equal to the boundaries")
 		}
+		first = false
 	}
-	if mutant[now].Pos < k {
-        now ++
-  }
-	return now
+	return now, movedRight
 }

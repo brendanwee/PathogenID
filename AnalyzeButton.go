@@ -2,6 +2,7 @@ package main
 
 import "github.com/murlokswarm/app"
 
+
 // FileSummary is the component displaying the summary of the input file.
 type AnalyzeButton struct {
 	Info string

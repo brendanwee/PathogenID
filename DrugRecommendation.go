@@ -11,9 +11,6 @@ func DrugRecom() {
 	InitializeAA()
 	InitializeCodonTable()
 	refCDNA = refSeq
-	//Transcription(refSeq)
-	//fmt.Println(aminoAcid)
-	//fmt.Println(CodonTable)
 	CheckMutation()
 }
 
@@ -100,10 +97,12 @@ func FindAA(m *Mutation, gene Gene) (thisRefAA AA, thisAltAA AA) {
 	case 0:
 		thisRefcodon = refCDNA[m.Pos-1 : m.Pos+2]
 		thisAltcodon = m.altSeq[0] + refCDNA[m.Pos:m.Pos+2]
+		fmt.Println(0, thisRefcodon, thisAltcodon)
 	// second base in a codon
 	case 1:
 		thisRefcodon = refCDNA[m.Pos-2 : m.Pos+1]
 		thisAltcodon = refCDNA[m.Pos-2:m.Pos-1] + m.altSeq[0] + refCDNA[m.Pos:m.Pos+1]
+		fmt.Println(1, thisRefcodon, thisAltcodon)
 	// third base in a codon
 	case 2:
 		thisRefcodon = refCDNA[m.Pos-3 : m.Pos]
@@ -125,20 +124,3 @@ func FindAA(m *Mutation, gene Gene) (thisRefAA AA, thisAltAA AA) {
 func CodonToAA(codon string) AA {
 	return CodonTable[codon]
 }
-
-// // Transcrip the DNA to mRNA
-// func Transcription(refSeq string) {
-//   for i := range refSeq {
-//     switch refSeq[i] {
-//     case 'A':
-//       refmRNA = refmRNA + "U"
-//     case 'T':
-//       refmRNA = refmRNA + "A"
-//     case 'C':
-//       refmRNA = refmRNA + "G"
-//     case 'G':
-//       refmRNA = refmRNA + "C"
-//     }
-//   }
-//   fmt.Println(refmRNA)
-// }

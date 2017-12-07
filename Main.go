@@ -3,13 +3,20 @@ package main
 import (
 	"path/filepath"
 	"runtime"
-
 	"github.com/murlokswarm/app"
 	_ "github.com/murlokswarm/mac"
 )
 
 // create global variables
 var (
+	fbpC, Rv0340, iniB, iniA, iniC, mabA, inhA, Rv1592c, Rv1772, ndh, katG, furA, srmR, fabD, kasA, accD6, oxyR, aphC, efpA, fadE24, nhoA Gene
+
+	pncA, rpsL, rrs, gidB, rpoB, embB, tlyA, embR, Rv3124, Rv3125c, Rv3264c, Rv3266c, embC, embA, ethA, gyrB, gyrA, thyA Gene
+
+	RIF, INH, PZA, SM, AMI, EMB, ETH, FLQ, PAS Drug
+	allDrug []Drug
+	allMutant MutationFile //not a file but ok
+
 	cwd          string
 	outputPath   string
 	win          app.Contexter
@@ -22,6 +29,7 @@ var (
 	pathogen     string
 	PathogenList = []string{"M. tuberculosis", "Staphylococcus aureus"} //A list of pathogens
 	numProcs     int
+  allGenes 		 []Gene
 )
 
 func main() {
@@ -31,7 +39,19 @@ func main() {
 	}
 	cwd = pwd()                         //  the current work directory
 	outputPath = MakeFolder("Analysis") // the directory of the result analysis folder
+	MakeFolder("Analysis/Results")
+	MakeFolder("resources/VCFPlots")
+
 	PrepareBin()
+	/*
+	ReadReference(cwd+"/Analysis/Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa")
+	ShowMutation(cwd+"/Analysis/test_data.called.vcf")
+	DrugRecom()
+	PrintAll()
+	WriteResult(allDrug)
+	VCFDetails()
+	os.Exit(0)
+	*/
 
 	// OnLaunch is a handler which is called when the app is initialized and ready.
 	// The main window is created here.

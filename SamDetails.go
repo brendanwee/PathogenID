@@ -8,7 +8,7 @@ import(
 )
 
 func SamDetails(samFile string)string{
-  prefix := MakeFolder("resources/SamPlots")
+  prefix := cwd+"/resources/SamPlots"
   reads, qualities, baseLocations := ReadSamFile(samFile)
   total := 0
   for i:=0;i<len(qualities);i++{
@@ -42,5 +42,6 @@ func ReadSamFile(samFile string) (int, []int, []int){
     CheckError(err)
     qualities = append(qualities,qScore)
   }
+  file.Close()
   return reads, qualities, baseLocations
 }

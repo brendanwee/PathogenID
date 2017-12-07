@@ -7,7 +7,7 @@ import (
   "strings"
 )
 
-var refSeq string
+var refSeq string //32Mb...
 
 // Read the DNA strand from file and store it into a slice.
 func ReadFromFile(filename string) (patient []string, quality []string, seqName []string) {

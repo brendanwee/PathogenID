@@ -7,9 +7,9 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+	"runtime"
 )
 
-//TODO: handle path so that there are no spaces
 
 func CheckError(err error) {
 	if err != nil {
@@ -80,18 +80,19 @@ func MakeSamFile(reference string, LN int, readFiles ...string) string {
 	}
 	OutputCommandToFile(bwaMem, samFile)
 	CheckSamFile(samFile, LN)
+	sam = append(sam,samFile)
 	return samFile
 }
 
 func MakeBamFile(samFile string) string {
-	samtoolsView := CreateCommand(cwd + "/bin/samtools view -@ " + strconv.Itoa(numProcs-1) + " -bS " + samFile)
+	samtoolsView := CreateCommand(cwd + "/bin/samtools view -@ " + strconv.Itoa(numProcs) + " -bS " + samFile)
 	bamFile := strings.Split(samFile, ".")[0] + ".bam"
 	OutputCommandToFile(samtoolsView, bamFile)
 	return bamFile
 }
 
 func SortBamFile(bamFile string) string {
-	samtoolsSort := CreateCommand(cwd + "/bin/samtools sort -@ " + strconv.Itoa(numProcs-1) + " " + bamFile)
+	samtoolsSort := CreateCommand(cwd + "/bin/samtools sort -@ " + strconv.Itoa(numProcs) + " " + bamFile)
 	sortedBam := strings.Split(bamFile, ".")[0] + ".sorted.bam"
 	OutputCommandToFile(samtoolsSort, sortedBam)
 	return sortedBam
@@ -114,11 +115,12 @@ func MakeVCF(reference, sortedBam string) string {
 	samtoolsMpileup := CreateCommand(cwd + "/bin/samtools mpileup -v --reference " + reference + " " + sortedBam)
 	vcfFile := strings.Split(sortedBam, ".")[0] + ".vcf"
 	OutputCommandToFile(samtoolsMpileup, vcfFile)
+	vcf = append(vcf,vcfFile)
 	return vcfFile
 }
 
 func CallVCF(vcfFile string) string {
-	bcfToolsCall := CreateCommand(cwd + "/bin/bcftools call --threads " + strconv.Itoa(numProcs-1) + " --ploidy 1 -c " + vcfFile)
+	bcfToolsCall := CreateCommand(cwd + "/bin/bcftools call --threads " + strconv.Itoa(numProcs) + " --ploidy 1 -c " + vcfFile)
 	calledVCFFile := strings.Split(vcfFile, ".")[0] + ".called.vcf"
 	OutputCommandToFile(bcfToolsCall, calledVCFFile)
 	return calledVCFFile
@@ -161,6 +163,7 @@ func OnlyAlign(readFiles []string) string {
 	//identify oraganism
 	reference, LN := HandleReference()
 	IndexReference(reference)
+	numProcs = runtime.NumCPU() //weird bug where global variable resets to 0
 
 	var samFile string
 	if len(readFiles) == 2 {
@@ -181,11 +184,20 @@ func OnlyVCF(bamFiles []string) string{
 	return calledVCFFile
 }
 
+func PredictResistance(reference, calledVCFFile string) string{
+	ReadReference(reference)
+	ShowMutation(calledVCFFile)
+	DrugRecom()
+	resistanceFile := WriteResult(allDrug)
+	return resistanceFile
+}
+
 func RunPipeline(readFiles []string) {
 	if len(readFiles) ==0{
 		fmt.Println("No files recieved")
 		return
 	}
+	numProcs = runtime.NumCPU() //weird bug where global variable resets to 0
 
 	pairedEnd := (len(readFiles) == 2)
 	//get Filename reads()
@@ -195,7 +207,7 @@ func RunPipeline(readFiles []string) {
 	sortedBam := AlignReads(reference, readFiles, LN, pairedEnd)
 
 	calledVCFFile := CallVariants(reference, sortedBam)
-	fmt.Println(calledVCFFile, "Created")
 
-	//ProcessVCF()
+	PredictResistance(reference, calledVCFFile)
+
 }

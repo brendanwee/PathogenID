@@ -146,21 +146,14 @@ func (m *FileMenu) OnCloseFileMenuClick() {
 
 // OnNewFileMenuClick is called when "New File" is clicked
 func (m *FileMenu) OnNewFileMenuClick() {
-	/*
-		subWin = newSubWindow() // create a NewWindow
-		newFile := &NewFile{}   // create a newFile struct with a plain textarea
-		subWin.Mount(newFile)   //Mount that NewFile component to the window
-	*/
 }
 
 // OnSaveFileMenuClick is called when "Save" is clicked
 func (m *FileMenu) OnSaveFileMenuClick() {
-
 }
 
 // OnSaveAsFileMenuClick is called when "Save As" is clicked
 func (m *FileMenu) OnSaveAsFileMenuClick() {
-
 }
 
 // AnalyzeMenu implements app.Componer interface.

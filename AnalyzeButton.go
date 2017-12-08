@@ -2,7 +2,6 @@ package main
 
 import "github.com/murlokswarm/app"
 
-
 // FileSummary is the component displaying the summary of the input file.
 type AnalyzeButton struct {
 	Info string
@@ -19,7 +18,7 @@ func (p *AnalyzeButton) Render() string {
 		<button onclick="OnPipelineButtonClick">Run Pipeline</button>
     <button onclick="OnAlignmentButtonClick">Alignment</button>
     <button onclick="OnVariantButtonClick">Identify variant</button>
-    <button onclick="OnClinicalButtonClick">Drug resistence</button>
+    <button onclick="OnClinicalButtonClick">Drug resistance</button>
     <button_previous onclick="OnPreviousButtonClick">Previous</button_previous>
     <button_next onclick="OnNextButtonClick">Next</button_next>
 	</div>
@@ -57,10 +56,9 @@ func PickFile(h *AnalyzeButton, files *[]string, command string) {
 			case "Drug":
 				h.Info = "Running... Please wait patiently for jumping. This may take a few minutes"
 				app.Render(h)
-				/*
-					txtFile := ClinicalAnaylisis(*files)// function that analyzes the .vcf file
-					resistence = append(resistence, txtFile) // append txt file to the list for result file paths
-				*/
+				reference, _ := HandleReference()
+				txtFile := PredictResistance(reference, (*files)[0]) // function that analyzes the .vcf file
+				resistence = append(resistence, txtFile)             // append txt file to the list for result file paths
 			}
 			fileSummary := &FileSummary{} // Creates a FileSummary component
 			win.Mount(fileSummary)        // Mounts the FileSummary component into the window context
@@ -124,12 +122,11 @@ func (h *AnalyzeButton) OnClinicalButtonClick() {
 	} else {
 		h.Info = "Running... Please wait patiently for jumping. This may take a few minutes"
 		app.Render(h)
-		/*
-			txtFile := ClinicalAnaylisis(vcf[0])// function that analyzes the .vcf file
-			resistence = append(resistence, txtFile) // append txt file to the list
-		*/
-		fileSummary := &FileSummary{} // Creates a FileSummary component
-		win.Mount(fileSummary)        // Mounts the FileSummary component into the window context
+		reference, _ := HandleReference()
+		txtFile := PredictResistance(reference, vcf[0]) // function that analyzes the .vcf file
+		resistence = append(resistence, txtFile)        // append txt file to the list for result file paths
+		fileSummary := &FileSummary{}                   // Creates a FileSummary component
+		win.Mount(fileSummary)                          // Mounts the FileSummary component into the window context
 	}
 }
 

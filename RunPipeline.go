@@ -5,15 +5,14 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"runtime"
 	"strconv"
 	"strings"
-	"runtime"
 )
-
 
 func CheckError(err error) {
 	if err != nil {
-    fmt.Println("ERROR:")
+		fmt.Println("ERROR:")
 		fmt.Println(err)
 		os.Exit(1)
 	}
@@ -80,7 +79,7 @@ func MakeSamFile(reference string, LN int, readFiles ...string) string {
 	}
 	OutputCommandToFile(bwaMem, samFile)
 	CheckSamFile(samFile, LN)
-	sam = append(sam,samFile)
+	sam = append(sam, samFile)
 	return samFile
 }
 
@@ -115,7 +114,7 @@ func MakeVCF(reference, sortedBam string) string {
 	samtoolsMpileup := CreateCommand(cwd + "/bin/samtools mpileup -v --reference " + reference + " " + sortedBam)
 	vcfFile := strings.Split(sortedBam, ".")[0] + ".vcf"
 	OutputCommandToFile(samtoolsMpileup, vcfFile)
-	vcf = append(vcf,vcfFile)
+	vcf = append(vcf, vcfFile)
 	return vcfFile
 }
 
@@ -133,14 +132,14 @@ func CallVariants(reference, sortedBam string) string {
 }
 
 func MakeFolder(folder string) string {
-	analysisFolder := cwd + "/"+folder+"/"
+	analysisFolder := cwd + "/" + folder + "/"
 	RunCommand(CreateCommand("mkdir " + analysisFolder))
 	return analysisFolder
 }
 
 func DownloadDriver() {
-  download := CreateCommand("go get -u github.com/murlokswarm/mac")
-  RunCommand(download)
+	download := CreateCommand("go get -u github.com/murlokswarm/mac")
+	RunCommand(download)
 }
 
 func GetSampleData() []string {
@@ -174,17 +173,16 @@ func OnlyAlign(readFiles []string) string {
 	return samFile
 }
 
-
-func OnlyVCF(bamFiles []string) string{
-  reference,_ := HandleReference()
+func OnlyVCF(bamFiles []string) string {
+	reference, _ := HandleReference()
 	IndexReference(reference)
 
-  calledVCFFile := CallVariants(reference, bamFiles[0])
-	PredictResistance(reference,calledVCFFile)
+	calledVCFFile := CallVariants(reference, bamFiles[0])
+	PredictResistance(reference, calledVCFFile)
 	return calledVCFFile
 }
 
-func PredictResistance(reference, calledVCFFile string) string{
+func PredictResistance(reference, calledVCFFile string) string {
 	ReadReference(reference)
 	ShowMutation(calledVCFFile)
 	DrugRecom()
@@ -193,7 +191,7 @@ func PredictResistance(reference, calledVCFFile string) string{
 }
 
 func RunPipeline(readFiles []string) {
-	if len(readFiles) ==0{
+	if len(readFiles) == 0 {
 		fmt.Println("No files recieved")
 		return
 	}

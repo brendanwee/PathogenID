@@ -3,6 +3,7 @@ package main
 import (
 	"path/filepath"
 	"runtime"
+
 	"github.com/murlokswarm/app"
 	_ "github.com/murlokswarm/mac"
 )
@@ -14,13 +15,13 @@ var (
 	pncA, rpsL, rrs, gidB, rpoB, embB, tlyA, embR, Rv3124, Rv3125c, Rv3264c, Rv3266c, embC, embA, ethA, gyrB, gyrA, thyA Gene
 
 	RIF, INH, PZA, SM, AMI, EMB, ETH, FLQ, PAS Drug
-	allDrug []Drug
-	allMutant MutationFile //not a file but ok
+	allDrug                                    []Drug
+	allMutant                                  MutationFile //not a file but ok
 
 	cwd          string
 	outputPath   string
 	win          app.Contexter
-	subWin       app.Contexter
+	subWin       app.Windower
 	fastq        []string
 	sam          []string
 	vcf          []string
@@ -29,7 +30,7 @@ var (
 	pathogen     string
 	PathogenList = []string{"M. tuberculosis", "Staphylococcus aureus"} //A list of pathogens
 	numProcs     int
-  allGenes 		 []Gene
+	allGenes     []Gene
 )
 
 func main() {
@@ -44,13 +45,13 @@ func main() {
 
 	PrepareBin()
 	/*
-	ReadReference(cwd+"/Analysis/Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa")
-	ShowMutation(cwd+"/Analysis/test_data.called.vcf")
-	DrugRecom()
-	PrintAll()
-	WriteResult(allDrug)
-	VCFDetails()
-	os.Exit(0)
+		ReadReference(cwd+"/Analysis/Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa")
+		ShowMutation(cwd+"/Analysis/test_data.called.vcf")
+		DrugRecom()
+		PrintAll()
+		WriteResult(allDrug)
+		VCFDetails()
+		os.Exit(0)
 	*/
 
 	// OnLaunch is a handler which is called when the app is initialized and ready.

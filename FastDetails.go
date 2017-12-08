@@ -77,7 +77,6 @@ func MakeHistogram(prefix, title string, data []int){
   graph.Add(histogram)
   fmt.Println("Saved ", "/"+prefix+"/"+title+".png")
   graph.Save(4*vg.Inch, 4*vg.Inch, "/"+prefix+"/"+title+".png")
-
 }
 
 func DrawBaseContentGraph(gContent, cContent, tContent, aContent float64, prefix string){

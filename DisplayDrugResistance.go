@@ -13,45 +13,44 @@ import (
 //ever written.
 
 type FinalTable struct {
-	ami3gene []string
 	OverallResistanceDescription string
 	Title                        string
-	RIF                          bool
-	rif1gene                     []string
-	rif2gene                     []string
-	rif3gene                     []string
-	INH                          bool
-	inh1gene                     []string
-	inh2gene                     []string
-	inh3gene                     []string
-	EMB                          bool
-	emb1gene                     []string
-	emb2gene                     []string
-	emb3gene                     []string
-	PZA                          bool
-	pza1gene                     []string
-	pza2gene                     []string
-	pza3gene                     []string
-	SM                           bool
-	sm1gene                      []string
-	sm2gene                      []string
-	sm3gene                      []string
-	AMI                          bool
-	ami1gene                     []string
-	ami2gene                     []string
-	ami3gene                     []string
-	ETH                          bool
-	eth1gene                     []string
-	eth2gene                     []string
-	eth3gene                     []string
-	FLQ                          bool
-	flq1gene                     []string
-	flq2gene                     []string
-	flq3gene                     []string
-	PAS                          bool
-	pas1gene                     []string
-	pas2gene                     []string
-	pas3gene                     []string
+	Rif                          bool
+	Rif1gene                     []string
+	Rif2gene                     []string
+	Rif3gene                     []string
+	Inh                          bool
+	Inh1gene                     []string
+	Inh2gene                     []string
+	Inh3gene                     []string
+	Emb                          bool
+	Emb1gene                     []string
+	Emb2gene                     []string
+	Emb3gene                     []string
+	Pza                          bool
+	Pza1gene                     []string
+	Pza2gene                     []string
+	Pza3gene                     []string
+	Sm                           bool
+	Sm1gene                      []string
+	Sm2gene                      []string
+	Sm3gene                      []string
+	Ami                          bool
+	Ami1gene                     []string
+	Ami2gene                     []string
+	Ami3gene                     []string
+	Eth                          bool
+	Eth1gene                     []string
+	Eth2gene                     []string
+	Eth3gene                     []string
+	Flq                          bool
+	Flq1gene                     []string
+	Flq2gene                     []string
+	Flq3gene                     []string
+	Pas                          bool
+	Pas1gene                     []string
+	Pas2gene                     []string
+	Pas3gene                     []string
 }
 
 // Render returns the HTML describing the FileSummary component content.
@@ -72,255 +71,357 @@ func (p *FinalTable) Render() string {
 	       <td>Amino Acid</td>
 	       <td>Confidence</td>
 	       <td>Description</td>
-	     </tr>
+	     </tr>{{if eq (len .Rif1gene) 5}}
 	     <tr>
-	     	<td>RIF</td>
-	   		<td>{{index .rif1gene 0}}</td>
-	       <td>{{index .rif1gene 1}}</td>
-	       <td>{{index .rif1gene 2}}</td>
-	       <td>{{index .rif1gene 3}}</td>
-	     </tr>
+	   		<td>{{index .Rif1gene 0}}</td>
+	       <td>{{index .Rif1gene 1}}</td>
+	       <td>{{index .Rif1gene 2}}</td>
+	       <td>{{index .Rif1gene 3}}</td>
+				 <td>{{index .Rif1gene 4}}</td>
+	     </tr>{{end}}{{if eq (len .Rif2gene) 5}}
 	   	<tr>
-	     	<td>RIF</td>
-	   		<td>{{index .rif2gene 0}}</td>
-	       <td>{{index .rif2gene 1}}</td>
-	       <td>{{index .rif2gene 2}}</td>
-	       <td>{{index .rif2gene 3}}</td>
-	     </tr>
+	     	<td>{{index .Rif2gene 0}}</td>
+	   		<td>{{index .Rif2gene 1}}</td>
+	       <td>{{index .Rif2gene 2}}</td>
+	       <td>{{index .Rif2gene 3}}</td>
+	       <td>{{index .Rif2gene 4}}</td>
+	     </tr>{{end}}{{if eq (len .Rif3gene) 5}}
 	   	<tr>
-	     	<td>RIF</td>
-	   		<td>{{index .rif3gene 0}}</td>
-	       <td>{{index .rif3gene 1}}</td>
-	       <td>{{index .rif3gene 2}}</td>
-	       <td>{{index .rif3gene 3}}</td>
-	     </tr>
+	   		<td>{{index .Rif3gene 0}}</td>
+	       <td>{{index .Rif3gene 1}}</td>
+	       <td>{{index .Rif3gene 2}}</td>
+	       <td>{{index .Rif3gene 3}}</td>
+				 <td>{{index .Rif3gene 4}}</td>
+	     </tr>{{end}}{{if eq (len .Inh1gene) 5}}
 	   	<tr>
-	     	<td>INH</td>
-	   		<td>{{index .inh1gene 0}}</td>
-	       <td>{{index .inh1gene 1}}</td>
-	       <td>{{index .inh1gene 2}}</td>
-	       <td>{{index .inh1gene 3}}</td>
-	     </tr>
+	   		<td>{{index .Inh1gene 0}}</td>
+	       <td>{{index .Inh1gene 1}}</td>
+	       <td>{{index .Inh1gene 2}}</td>
+	       <td>{{index .Inh1gene 3}}</td>
+				 <td>{{index .Inh1gene 4}}</td>
+	     </tr>{{end}}{{if eq (len .Inh2gene) 5}}
 	   	<tr>
-	     	<td>INH</td>
-	   		<td>{{index .inh2gene 0}}</td>
-	       <td>{{index .inh2gene 1}}</td>
-	       <td>{{index .inh2gene 2}}</td>
-	       <td>{{index .inh2gene 3}}</td>
-	     </tr>
+	   		<td>{{index .Inh2gene 0}}</td>
+	       <td>{{index .Inh2gene 1}}</td>
+	       <td>{{index .Inh2gene 2}}</td>
+	       <td>{{index .Inh2gene 3}}</td>
+				 <td>{{index .Inh2gene 4}}</td>
+	     </tr>{{end}}{{if eq (len .Inh3gene) 5}}
 	   	<tr>
-	     	<td>INH</td>
-	   		<td>{{index .inh3gene 0}}</td>
-	       <td>{{index .inh3gene 1}}</td>
-	       <td>{{index .inh3gene 2}}</td>
-	       <td>{{index .inh3gene 3}}</td>
-	     </tr>
+	   		<td>{{index .Inh3gene 0}}</td>
+	       <td>{{index .Inh3gene 1}}</td>
+	       <td>{{index .Inh3gene 2}}</td>
+	       <td>{{index .Inh3gene 3}}</td>
+				 <td>{{index .Inh3gene 3}}</td>
+	     </tr>{{end}}{{if eq (len .Emb1gene) 5}}
 	   	<tr>
-	     	<td>EMB</td>
-	   		<td>{{index .emb1gene 0}}</td>
-	       <td>{{index .emb1gene 1}}</td>
-	       <td>{{index .emb1gene 2}}</td>
-	       <td>{{index .emb1gene 3}}</td>
-	     </tr>
+	   		<td>{{index .Emb1gene 0}}</td>
+	       <td>{{index .Emb1gene 1}}</td>
+	       <td>{{index .Emb1gene 2}}</td>
+	       <td>{{index .Emb1gene 3}}</td>
+				 <td>{{index .Emb1gene 4}}</td>
+		  </tr>{{end}}{{if eq (len .Emb2gene) 5}}
 	   	<tr>
-	     	<td>EMB</td>
-	   		<td>{{index .emb2gene 0}}</td>
-	       <td>{{index .emb2gene 1}}</td>
-	       <td>{{index .emb2gene 2}}</td>
-	       <td>{{index .emb2gene 3}}</td>
-	     </tr>
+	   		<td>{{index .Emb2gene 0}}</td>
+	       <td>{{index .Emb2gene 1}}</td>
+	       <td>{{index .Emb2gene 2}}</td>
+	       <td>{{index .Emb2gene 3}}</td>
+				 <td>{{index .Emb2gene 4}}</td>
+		  </tr>{{end}}{{if eq (len .Emb3gene) 5}}
 	   	<tr>
-	     	<td>EMB</td>
-	   		<td>{{index .emb3gene 0}}</td>
-	       <td>{{index .emb3gene 1}}</td>
-	       <td>{{index .emb3gene 2}}</td>
-	       <td>{{index .emb3gene 3}}</td>
-	     </tr>
+	   		<td>{{index .Emb3gene 0}}</td>
+	       <td>{{index .Emb3gene 1}}</td>
+	       <td>{{index .Emb3gene 2}}</td>
+	       <td>{{index .Emb3gene 3}}</td>
+				 <td>{{index .Emb3gene 4}}</td>
+				</tr>{{end}}{{if eq (len .Pza1gene) 5}}
 	   	<tr>
-	     	<td>PZA</td>
-	   		<td>{{index .pza1gene 0}}</td>
-	       <td>{{index .pza1gene 1}}</td>
-	       <td>{{index .pza1gene 2}}</td>
-	       <td>{{index .pza1gene 3}}</td>
-	     </tr>
+	   		<td>{{index .Pza1gene 0}}</td>
+	       <td>{{index .Pza1gene 1}}</td>
+	       <td>{{index .Pza1gene 2}}</td>
+	       <td>{{index .Pza1gene 3}}</td>
+				 <td>{{index .Pza1gene 4}}</td>
+				</tr>{{end}}{{if eq (len .Pza2gene) 5}}
 	   	<tr>
-	     	<td>PZA</td>
-	   		<td>{{index .pza2gene 0}}</td>
-	       <td>{{index .pza2gene 1}}</td>
-	       <td>{{index .pza2gene 2}}</td>
-	       <td>{{index .pza2gene 3}}</td>
-	     </tr>
+	   		<td>{{index .Pza2gene 0}}</td>
+	       <td>{{index .Pza2gene 1}}</td>
+	       <td>{{index .Pza2gene 2}}</td>
+	       <td>{{index .Pza2gene 3}}</td>
+				 <td>{{index .Pza2gene 4}}</td>
+				</tr>{{end}}{{if eq (len .Pza3gene) 5}}
 	   	<tr>
-	     	<td>PZA</td>
-	   		<td>{{index .pza3gene 0}}</td>
-	       <td>{{index .pza3gene 1}}</td>
-	       <td>{{index .pza3gene 2}}</td>
-	       <td>{{index .pza3gene 3}}</td>
-	     </tr>
+	   		<td>{{index .Pza3gene 0}}</td>
+	       <td>{{index .Pza3gene 1}}</td>
+	       <td>{{index .Pza3gene 2}}</td>
+	       <td>{{index .Pza3gene 3}}</td>
+				 <td>{{index .Pza4gene 4}}</td>
+				</tr>{{end}}{{if eq (len .Sm1gene) 5}}
 	   	<tr>
-	     	<td>SM</td>
-	   		<td>{{index .sm1gene 0}}</td>
-	       <td>{{index .sm1gene 1}}</td>
-	       <td>{{index .sm1gene 2}}</td>
-	       <td>{{index .sm1gene 3}}</td>
-	     </tr>
+	   		<td>{{index .Sm1gene 0}}</td>
+	       <td>{{index .Sm1gene 1}}</td>
+	       <td>{{index .Sm1gene 2}}</td>
+	       <td>{{index .Sm1gene 3}}</td>
+				 <td>{{index .Sm1gene 4}}</td>
+				</tr>{{end}}{{if eq (len .Sm2gene) 5}}
 	   	<tr>
-	     	<td>SM</td>
-	   		<td>{{index .sm2gene 0}}</td>
-	       <td>{{index .sm2gene 1}}</td>
-	       <td>{{index .sm2gene 2}}</td>
-	       <td>{{index .sm2gene 3}}</td>
-	     </tr>
+	   		<td>{{index .Sm2gene 0}}</td>
+	       <td>{{index .Sm2gene 1}}</td>
+	       <td>{{index .Sm2gene 2}}</td>
+	       <td>{{index .Sm2gene 3}}</td>
+				 <td>{{index .Sm2gene 4}}</td>
+				</tr>{{end}}{{if eq (len .Sm3gene) 5}}
 	   	<tr>
-	     	<td>SM</td>
-	   		<td>{{index .sm3gene 0}}</td>
-	       <td>{{index .sm3gene 1}}</td>
-	   		<td>{{index .sm3gene 2}}</td>
-	       <td>{{index .sm3gene 3}}</td>
-	     </tr>
+	   		<td>{{index .Sm3gene 0}}</td>
+	       <td>{{index .Sm3gene 1}}</td>
+	   		<td>{{index .Sm3gene 2}}</td>
+	       <td>{{index .Sm3gene 3}}</td>
+				 <td>{{index .Sm3gene 4}}</td>
+			 </tr>{{end}}{{if eq (len .Ami1gene) 5}}
+		 <tr>
+			 <td>{{index .Ami1gene 0}}</td>
+				<td>{{index .Ami1gene 1}}</td>
+				<td>{{index .Ami1gene 2}}</td>
+				<td>{{index .Ami1gene 3}}</td>
+				<td>{{index .Ami1gene 4}}</td>
+			 </tr>{{end}}{{if eq (len .Ami2gene) 5}}
+		 <tr>
+			 <td>{{index .Ami2gene 0}}</td>
+				<td>{{index .Ami2gene 1}}</td>
+				<td>{{index .Ami2gene 2}}</td>
+				<td>{{index .Ami2gene 3}}</td>
+				<td>{{index .Ami2gene 4}}</td>
+			 </tr>{{end}}{{if eq (len .Ami3gene) 5}}
+		 <tr>
+			 <td>{{index .Ami3gene 0}}</td>
+				<td>{{index .Ami3gene 1}}</td>
+				<td>{{index .Ami3gene 2}}</td>
+				<td>{{index .Ami3gene 3}}</td>
+				<td>{{index .Ami3gene 4}}</td>
+			 </tr>{{end}}{{if eq (len .Eth1gene) 5}}
+		 <tr>
+			 <td>{{index .Eth1gene 0}}</td>
+				<td>{{index .Eth1gene 1}}</td>
+				<td>{{index .Eth1gene 2}}</td>
+				<td>{{index .Eth1gene 3}}</td>
+				<td>{{index .Eth1gene 4}}</td>
+			 </tr>{{end}}{{if eq (len .Eth2gene) 5}}
+		 <tr>
+			 <td>{{index .Eth2gene 0}}</td>
+				<td>{{index .Eth2gene 1}}</td>
+				<td>{{index .Eth2gene 2}}</td>
+				<td>{{index .Eth2gene 3}}</td>
+				<td>{{index .Eth2gene 4}}</td>
+			 </tr>{{end}}{{if eq (len .Eth3gene) 5}}
+		 <tr>
+			 <td>{{index .Eth3gene 0}}</td>
+				<td>{{index .Eth3gene 1}}</td>
+				<td>{{index .Eth3gene 2}}</td>
+				<td>{{index .Eth3gene 3}}</td>
+				<td>{{index .Eth3gene 4}}</td>
+			 </tr>{{end}}{{if eq (len .Flq1gene) 5}}
+		 <tr>
+			 <td>{{index .Flq1gene 0}}</td>
+				<td>{{index .Flq1gene 1}}</td>
+				<td>{{index .Flq1gene 2}}</td>
+				<td>{{index .Flq1gene 3}}</td>
+				<td>{{index .Flq1gene 4}}</td>
+			 </tr>{{end}}{{if eq (len .Flq2gene) 5}}
+		 <tr>
+			 <td>{{index .Flq2gene 0}}</td>
+				<td>{{index .Flq2gene 1}}</td>
+				<td>{{index .Flq2gene 2}}</td>
+				<td>{{index .Flq2gene 3}}</td>
+				<td>{{index .Flq2gene 4}}</td>
+			 </tr>{{end}}{{if eq (len .Flq3gene) 5}}
+		 <tr>
+			 <td>{{index .Flq3gene 0}}</td>
+				<td>{{index .Flq3gene 1}}</td>
+				<td>{{index .Flq3gene 2}}</td>
+				<td>{{index .Flq3gene 3}}</td>
+				<td>{{index .Flq3gene 4}}</td>
+			 </tr>{{end}}{{if eq (len .Pas1gene) 5}}
+		 <tr>
+			 <td>{{index .Pas1gene 0}}</td>
+				<td>{{index .Pas1gene 1}}</td>
+				<td>{{index .Pas1gene 2}}</td>
+				<td>{{index .Pas1gene 3}}</td>
+				<td>{{index .Pas1gene 4}}</td>
+			 </tr>{{end}}{{if eq (len .Pas2gene) 5}}
+		 <tr>
+			 <td>{{index .Pas2gene 0}}</td>
+				<td>{{index .Pas2gene 1}}</td>
+				<td>{{index .Pas2gene 2}}</td>
+				<td>{{index .Pas2gene 3}}</td>
+				<td>{{index .Pas2gene 4}}</td>
+			 </tr>{{end}}{{if eq (len .Pas3gene) 5}}
+		 <tr>
+			 <td>{{index .Pas3gene 0}}</td>
+				<td>{{index .Pas3gene 1}}</td>
+				<td>{{index .Pas3gene 2}}</td>
+				<td>{{index .Pas3gene 3}}</td>
+				<td>{{index .Pas3gene 4}}</td>
+			 </tr>{{end}}
 	   </table>
-
 	   </body>
-	   `*/
+`
+}
+
+// HasString returns true if the array contains the string
+func HasString(x []string, y string) bool {
+	for i := range x {
+		if x[i] == y {
+			return true
+		}
+	}
+	return false
 }
 
 func (p *FinalTable) DisplayFinalTable(resultFile string) {
-	file, err := os.Open("/Users/jinkeliu/Documents/GitHub/PathogenID/Analysis/Results/DrugResistance.txt")
+	file, err := os.Open(resultFile)
 	CheckError(err)
 	scanner := bufio.NewScanner(file)
 	scanner.Scan()
 	count := 0
+	var overall []string
 	for scanner.Scan() {
 		items := strings.Split(scanner.Text(), "\t")
+		if !HasString(overall, items[0]) {
+			overall = append(overall, items[0])
+		}
 		switch items[0] {
 		case "Rifampin":
-			if !p.RIF { //rifampin first time
-				p.RIF = true
+			if !p.Rif { //Rifampin first time
+				p.Rif = true
 				count = 1
-				p.rif1gene = append(items[:4], items[6])
-			} else if count == 1 && p.RIF {
-				p.rif2gene = append(items[:4], items[6])
+				p.Rif1gene = append(items[:4], items[6])
+			} else if count == 1 && p.Rif {
+				p.Rif2gene = append(items[:4], items[6])
 				count += 1
-			} else if count == 2 && p.RIF {
-				p.rif3gene = append(items[:4], items[6])
+			} else if count == 2 && p.Rif {
+				p.Rif3gene = append(items[:4], items[6])
 				count += 1
 			} else { //count is too high
 				continue
 			}
 		case "Isoniazid":
-			if !p.INH { //INHampin first time
-				p.INH = true
+			if !p.Inh { //Inhampin first time
+				p.Inh = true
 				count = 1
-				p.inh1gene = append(items[:4], items[6])
-			} else if count == 1 && p.INH {
-				p.inh2gene = append(items[:4], items[6])
+				p.Inh1gene = append(items[:4], items[6])
+			} else if count == 1 && p.Inh {
+				p.Inh2gene = append(items[:4], items[6])
 				count += 1
-			} else if count == 2 && p.INH {
-				p.inh3gene = append(items[:4], items[6])
+			} else if count == 2 && p.Inh {
+				p.Inh3gene = append(items[:4], items[6])
 				count += 1
 			} else { //count is too high
 				continue
 			}
-		case "Pyrazinamide":
-			if !p.PZA { //rifampin first time
-				p.PZA = true
+		case "PyrazinAmide":
+			if !p.Pza { //Rifampin first time
+				p.Pza = true
 				count = 1
-				p.pza1gene = append(items[:4], items[6])
-			} else if count == 1 && p.PZA {
-				p.pza2gene = append(items[:4], items[6])
+				p.Pza1gene = append(items[:4], items[6])
+			} else if count == 1 && p.Pza {
+				p.Pza2gene = append(items[:4], items[6])
 				count += 1
-			} else if count == 2 && p.PZA {
-				p.pza3gene = append(items[:4], items[6])
+			} else if count == 2 && p.Pza {
+				p.Pza3gene = append(items[:4], items[6])
 				count += 1
 			} else { //count is too high
 				continue
 			}
 		case "Streptomycin":
-			if !p.SM { //rifampin first time
-				p.SM = true
+			if !p.Sm { //Rifampin first time
+				p.Sm = true
 				count = 1
-				p.sm1gene = append(items[:4], items[6])
-			} else if count == 1 && p.SM {
-				p.sm2gene = append(items[:4], items[6])
+				p.Sm1gene = append(items[:4], items[6])
+			} else if count == 1 && p.Sm {
+				p.Sm2gene = append(items[:4], items[6])
 				count += 1
-			} else if count == 2 && p.SM {
-				p.sm3gene = append(items[:4], items[6])
+			} else if count == 2 && p.Sm {
+				p.Sm3gene = append(items[:4], items[6])
 				count += 1
 			} else { //count is too high
 				continue
 			}
 		case "Aminoglycosides":
-			if !p.AMI { //rifampin first time
-				p.AMI = true
+			if !p.Ami { //Rifampin first time
+				p.Ami = true
 				count = 1
-				p.ami1gene = append(items[:4], items[6])
-			} else if count == 1 && p.AMI {
-				p.ami2gene = append(items[:4], items[6])
+				p.Ami1gene = append(items[:4], items[6])
+			} else if count == 1 && p.Ami {
+				p.Ami2gene = append(items[:4], items[6])
 				count += 1
-			} else if count == 2 && p.AMI {
-				p.ami3gene = append(items[:4], items[6])
+			} else if count == 2 && p.Ami {
+				p.Ami3gene = append(items[:4], items[6])
 				count += 1
 			} else { //count is too high
 				continue
 			}
 		case "Ethambutol":
-			if !p.EMB { //rifampin first time
-				p.EMB = true
+			if !p.Emb { //Rifampin first time
+				p.Emb = true
 				count = 1
-				p.emb1gene = append(items[:4], items[6])
-			} else if count == 1 && p.EMB {
-				p.emb2gene = append(items[:4], items[6])
+				p.Emb1gene = append(items[:4], items[6])
+			} else if count == 1 && p.Emb {
+				p.Emb2gene = append(items[:4], items[6])
 				count += 1
-			} else if count == 2 && p.EMB {
-				p.emb3gene = append(items[:4], items[6])
+			} else if count == 2 && p.Emb {
+				p.Emb3gene = append(items[:4], items[6])
 				count += 1
 			} else { //count is too high
 				continue
 			}
-		case "Ethionamide":
-			if !p.ETH { //rifampin first time
-				p.ETH = true
+		case "EthionAmide":
+			if !p.Eth { //Rifampin first time
+				p.Eth = true
 				count = 1
-				p.eth1gene = append(items[:4], items[6])
-			} else if count == 1 && p.ETH {
-				p.eth2gene = append(items[:4], items[6])
+				p.Eth1gene = append(items[:4], items[6])
+			} else if count == 1 && p.Eth {
+				p.Eth2gene = append(items[:4], items[6])
 				count += 1
-			} else if count == 2 && p.ETH {
-				p.eth3gene = append(items[:4], items[6])
+			} else if count == 2 && p.Eth {
+				p.Eth3gene = append(items[:4], items[6])
 				count += 1
 			} else { //count is too high
 				continue
 			}
 		case "Fluoroquinolones":
-			if !p.FLQ { //rifampin first time
-				p.FLQ = true
+			if !p.Flq { //Rifampin first time
+				p.Flq = true
 				count = 1
-				p.flq1gene = append(items[:4], items[6])
-			} else if count == 1 && p.FLQ {
-				p.flq2gene = append(items[:4], items[6])
+				p.Flq1gene = append(items[:4], items[6])
+			} else if count == 1 && p.Flq {
+				p.Flq2gene = append(items[:4], items[6])
 				count += 1
-			} else if count == 2 && p.FLQ {
-				p.flq3gene = append(items[:4], items[6])
+			} else if count == 2 && p.Flq {
+				p.Flq3gene = append(items[:4], items[6])
 				count += 1
 			} else { //count is too high
 				continue
 			}
 		case "Para-Aminosalicylic Acid":
-			if !p.PAS { //rifampin first time
-				p.PAS = true
+			if !p.Pas { //Rifampin first time
+				p.Pas = true
 				count = 1
-				p.pas1gene = append(items[:4], items[6])
-			} else if count == 1 && p.PAS {
-				p.pas2gene = append(items[:4], items[6])
+				p.Pas1gene = append(items[:4], items[6])
+			} else if count == 1 && p.Pas {
+				p.Pas2gene = append(items[:4], items[6])
 				count += 1
-			} else if count == 2 && p.PAS {
-				p.pas3gene = append(items[:4], items[6])
+			} else if count == 2 && p.Pas {
+				p.Pas3gene = append(items[:4], items[6])
 				count += 1
 			} else { //count is too high
 				continue
 			}
 		}
 	}
+	description := "Overall Resistance: "
+	for i := range overall {
+		description += overall[i] + "; "
+	}
+	p.OverallResistanceDescription = description
 }
 
 // /!\ Register the component. Required to use the component into a context.

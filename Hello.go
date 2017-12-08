@@ -4,7 +4,6 @@ import (
 	"github.com/murlokswarm/app"
 )
 
-// Hello implements app.Componer interface.
 // This is the initial interface when opening up the UI
 type Hello struct {
 	Greeting string

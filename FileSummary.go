@@ -163,13 +163,10 @@ func (f *FileSummary) OnResistenceButtonClick() {
 				return true
 			},
 		})
-		final := &FinalTable{} // Creates a Graph component.
+		final := &FinalTable{} // Creates a FinalTable component.
 		subWin.Mount(final)    // Mounts the Hello component into the window context.
 		final.DisplayFinalTable(resistence[0])
 		app.Render(final)
-		f.Output = "Fastq summay present here!  &#13;&#10; We can start a new line here too."
-		app.Render(f)           // Tells the app to update the rendering of the component.
-		subWin = newSubWindow() // Pop up a new window for the graph display
 	}
 }
 

@@ -40,19 +40,12 @@ func main() {
 	}
 	cwd = pwd()                         //  the current work directory
 	outputPath = MakeFolder("Analysis") // the directory of the result analysis folder
-	MakeFolder("Analysis/Results")
-	MakeFolder("resources/VCFPlots")
+	MakeFolder("Analysis/Results")      // make the folder to store all the result files
+	MakeFolder("resources/Fastq_Plots") // make the folder to store plots for fastq display
+	MakeFolder("resources/SamPlots")    // make the folder to store plots for sam display
+	MakeFolder("resources/VCFPlots")    // make the folder to store plots for vcf display
 
-	PrepareBin()
-	/*
-		ReadReference(cwd+"/Analysis/Mycobacterium_tuberculosis_h37rv.ASM19595v2.dna.chromosome.Chromosome.fa")
-		ShowMutation(cwd+"/Analysis/test_data.called.vcf")
-		DrugRecom()
-		PrintAll()
-		WriteResult(allDrug)
-		VCFDetails()
-		os.Exit(0)
-	*/
+	PrepareBin() // creates command chmod 755 for each file in PathogenID/bin
 
 	// OnLaunch is a handler which is called when the app is initialized and ready.
 	// The main window is created here.
@@ -92,15 +85,6 @@ func main() {
 			return false
 		}
 	}
-
-	// OnFinalize is a handler which (if set) is called when the app is about
-	// to be terminated.
-	// It should be used to perform any final cleanup before the application
-	// terminates.
-	app.OnFinalize = func() {
-
-	}
-
 	// Run the application
 	app.Run()
 }
@@ -118,17 +102,8 @@ func newMainWindow() app.Contexter {
 			win = nil
 			return true
 		},
-		OnMinimize:       func() {},
-		OnDeminimize:     func() {},
-		OnFullScreen:     func() {},
-		OnExitFullScreen: func() {},
-		OnMove:           func(x float64, y float64) {},
-		OnResize:         func(width float64, height float64) {},
-		OnFocus:          func() {},
-		OnBlur:           func() {},
 	})
-
-	hello := &Hello{} // Creates a Hello component.
+	hello := &Hello{} // Creates a Hello component as the welcome interface
 	win.Mount(hello)  // Mounts the Hello component into the window context.
 	return win
 }

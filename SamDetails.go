@@ -29,18 +29,18 @@ func ReadSamFile(samFile string) (int, []int, []int){
   scanner := bufio.NewScanner(file)
   scanner.Scan()
   for scanner.Scan(){
-    reads += 1
+    reads += 1 // count the reads
     alignedRead := strings.Split(scanner.Text(),"\t")
-    bases := make([]int,len(alignedRead[9]))
-    pos, err := strconv.Atoi(alignedRead[3])
+    bases := make([]int,len(alignedRead[9])) // save each bases location on the genome to generate coverage plot
+    pos, err := strconv.Atoi(alignedRead[3]) //the position in the genome
     CheckError(err)
     for i := range(bases){
       bases[i] = pos+i
     }
-    baseLocations = append(baseLocations,bases...)
-    qScore,err := strconv.Atoi(alignedRead[4])
+    baseLocations = append(baseLocations,bases...) //append to master slice
+    qScore,err := strconv.Atoi(alignedRead[4]) //grab the qScore of the individual read
     CheckError(err)
-    qualities = append(qualities,qScore)
+    qualities = append(qualities,qScore) // append to master quality
   }
   file.Close()
   return reads, qualities, baseLocations

@@ -41,7 +41,7 @@ func WriteResult(allDrug []Drug) string {
 					refCharge :=ConvertCharge(allDrug[i].resistance[j].mutations[k].refAA.charge)
 					altCharge :=ConvertCharge(allDrug[i].resistance[j].mutations[k].altAA.charge)
 					COD := allDrug[i].resistance[j].mutations[k].refCodon + "->" + allDrug[i].resistance[j].mutations[k].altCodon + "\t"
-					CONF := strconv.FormatFloat(math.Log10((allDrug[i].resistance[j].mutations[k].confidence/10)),'f',2,64)
+					CONF := strconv.FormatFloat(math.Pow(10,(allDrug[i].resistance[j].mutations[k].confidence/10)),'f',2,64)
 					DESC := "The change from a "+refPol+" "+refCharge+ " charged amino acid to a "+ altPol + " " + altCharge + " charged amino acid may affect this proteins susceptibility to "+DRUG+
 					". We are "+CONF+"'%' sure this mutation is real."
 					mutationLine = mutationLine + DRUG+"\t"+geneName+"\t"+POS+"\t"+AA+"\t"+COD+"\t"+CONF+"\t"+DESC

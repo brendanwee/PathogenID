@@ -14,6 +14,10 @@ import(
 
 type adapter [2]string //name then sequence
 
+/*
+MakeAdapterMap makes a map where the keys are the sequences of the adapters
+in adapter.fasta and the keys are ints
+*/
 func MakeAdapterMap() map[adapter]int {
   adapterFile,err := os.Open("adapter.fasta")
   CheckError(err)
@@ -32,6 +36,9 @@ func MakeAdapterMap() map[adapter]int {
   return adapterMap
 }
 
+/*
+counts all the nucleotide bases in a sequence of bytes
+*/
 func CountBases(G,A,C,T *int, sequence string){
   for i:=0; i<len(sequence);i++{
     switch sequence[i]{
@@ -47,6 +54,9 @@ func CountBases(G,A,C,T *int, sequence string){
   }
 }
 
+/*
+adds the q score for each base to the same and appends it to the q slice as well. the q slice is then returned.
+*/
 func SumQScore(sum *int, qscore string) []int{
   var q []int
   for i:=0;i<len(qscore);i++{
@@ -56,6 +66,9 @@ func SumQScore(sum *int, qscore string) []int{
   return q
 }
 
+/*
+for every sequence in the adapter map, a string is queried to determine if the adapter falls within it.
+*/
 func CheckForAdapters(adapterMap map[adapter]int, sequence string){
   for adapter, count := range(adapterMap){
       if strings.Contains(sequence, adapter[1]){
@@ -63,7 +76,10 @@ func CheckForAdapters(adapterMap map[adapter]int, sequence string){
       }
   }
 }
-
+/*
+Given a path, filename, and some data, MakeHistogram draws a histogram of the data
+and saves is at path/filename
+*/
 func MakeHistogram(prefix, title string, data []int){
   lengths := make(plotter.Values, len(data))
 	for i :=0; i< len(data); i++ {
@@ -79,6 +95,9 @@ func MakeHistogram(prefix, title string, data []int){
   graph.Save(4*vg.Inch, 4*vg.Inch, "/"+prefix+"/"+title+".png")
 }
 
+/*
+Draws a bar graph of a the bases
+*/
 func DrawBaseContentGraph(gContent, cContent, tContent, aContent float64, prefix string){
   plot,err := plot.New()
   CheckError(err)
@@ -114,6 +133,9 @@ func DrawBaseContentGraph(gContent, cContent, tContent, aContent float64, prefix
   plot.Save(4*vg.Inch, 4*vg.Inch, prefix+"BaseContent.png")
 }
 
+/*
+draws of bar chart where each adapter is given a bar in the graph.
+*/
 func DrawAdapterContent(adapterMap map[adapter]int, prefix string){
   plot,err := plot.New()
   CheckError(err)
@@ -137,6 +159,10 @@ func DrawAdapterContent(adapterMap map[adapter]int, prefix string){
 }
 
 
+/*
+FastDetails iterates over read files and reads them line by line. If its a
+fastq its sequence line and quality line are mined for data. If just a fasta then the sequence line is mined
+*/
 func FastDetails(readFiles []string) string{
   prefix := cwd+"/resources/Fastq_Plots/"
   MakeAdapterMap()
@@ -185,9 +211,9 @@ func FastDetails(readFiles []string) string{
   averageReadQuality := float64(qualitySum)/float64(totalBases)
   averageReadLengths := float64(totalBases)/float64(numReads)
   output := `G/C Content: G: `+ strconv.FormatFloat(gContent,'f',2,64) + ` C: ` + strconv.FormatFloat(cContent,'f',2,64)+ `&#13;&#10;`+
-`Per Base Sequnce Content: G: ` + strconv.FormatFloat(gContent,'f',2,64) + ` C: ` + strconv.FormatFloat(cContent,'f',2,64) + ` A: ` + strconv.FormatFloat(aContent,'f',2,64) + ` T: ` + strconv.FormatFloat(tContent,'f',2,64) + `$#13;$#10;` +
-`Average Read Quality: ` + strconv.FormatFloat(averageReadQuality,'f',2,64) +`$#13;$#10;` +
-`Average Read Length: ` + strconv.FormatFloat(averageReadLengths,'f',2,64) + `$#13;$#10;` +
+`Per Base Sequnce Content: G: ` + strconv.FormatFloat(gContent,'f',2,64) + ` C: ` + strconv.FormatFloat(cContent,'f',2,64) + ` A: ` + strconv.FormatFloat(aContent,'f',2,64) + ` T: ` + strconv.FormatFloat(tContent,'f',2,64) + `&#13;&#10;` +
+`Average Read Quality: ` + strconv.FormatFloat(averageReadQuality,'f',2,64) +`&#13;$#10;` +
+`Average Read Length: ` + strconv.FormatFloat(averageReadLengths,'f',2,64) + `&#13;$#10;` +
 `Analyzed ` + strconv.Itoa(numReads) + `reads`
   MakeHistogram(prefix,"readlengths",readLengths)
   MakeHistogram(prefix,"Quality Scores of Raw Reads", qScores)

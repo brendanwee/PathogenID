@@ -8,7 +8,10 @@ import(
   "os/exec"
 )
 
-//takes a genomeFile and returns the amount of nucleotides in it.
+/*
+Takes a genomeFile and returns the amount of nucleotides in it. Iterates over the genomeFile
+one line at a time counting the number of bases as it goes.
+*/
 func GetGenomeLength(genomeFile string) int {
   file,err := os.Open(genomeFile)
   CheckError(err)
@@ -27,6 +30,10 @@ func GetGenomeLength(genomeFile string) int {
   return LN
 }
 
+/*
+Accepts an absolute path to the reference file where it compares its md5 sum
+with the one hardcoded below.
+*/
 func CheckReferenceFile(reference string) {
   md5 := MD5(reference)
   errorMessage := `ERROR: Reference file did not download properly. Please check
@@ -44,6 +51,9 @@ func CheckReferenceFile(reference string) {
   }
 }
 
+/*
+creates an md5 command and returns its text
+*/
 func MD5(filename string) string {
   md5 := CreateCommand("md5 "+filename)
   OutputCommandToFile(md5, filename+".md5")

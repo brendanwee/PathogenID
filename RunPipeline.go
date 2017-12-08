@@ -37,12 +37,14 @@ func CheckSamFile(samFile string, LN int) {
 	}
 }
 
+//indexes a reference genome
 func IndexReference(reference string) {
 	//index genome
 	bwaIndex := CreateCommand(cwd + "/bin/bwa index " + reference)
 	RunCommand(bwaIndex)
 }
 
+//checks the bin to ensure the correct binaries are stored there.
 func CheckBin() {
 	cmd := "ls " + cwd + "/bin"
 	lsBin := CreateCommand(cmd)
@@ -53,6 +55,7 @@ func CheckBin() {
 	}
 }
 
+//uses chmod to change the permissions of the necessary executives in this program
 func MakeBinExecutable() {
 	executables := []string{"bwa", "samtools", "bcftools"}
 	for i := 0; i < len(executables); i++ {
@@ -62,11 +65,15 @@ func MakeBinExecutable() {
 	}
 }
 
+//Checks to be sure the right files are there.Makes the bin executable
 func PrepareBin() {
 	CheckBin()
 	MakeBinExecutable()
 }
 
+//given a reference, the length of the reference and a set of reads,
+//MakeSamFile aligns the reads to the reference genome and returns a path to
+//the samFile
 func MakeSamFile(reference string, LN int, readFiles ...string) string {
 	folders := strings.Split(strings.TrimSuffix(readFiles[0], ".fastq"), "/")
 	filename := folders[len(folders)-1]
@@ -83,6 +90,7 @@ func MakeSamFile(reference string, LN int, readFiles ...string) string {
 	return samFile
 }
 
+// calls samtools view to turn a sm file into a more compressed bam file
 func MakeBamFile(samFile string) string {
 	samtoolsView := CreateCommand(cwd + "/bin/samtools view -@ " + strconv.Itoa(numProcs) + " -bS " + samFile)
 	bamFile := strings.Split(samFile, ".")[0] + ".bam"
@@ -90,6 +98,9 @@ func MakeBamFile(samFile string) string {
 	return bamFile
 }
 
+/*
+calls samtools sort to sort the binary alignment file
+*/
 func SortBamFile(bamFile string) string {
 	samtoolsSort := CreateCommand(cwd + "/bin/samtools sort -@ " + strconv.Itoa(numProcs) + " " + bamFile)
 	sortedBam := strings.Split(bamFile, ".")[0] + ".sorted.bam"
@@ -97,6 +108,10 @@ func SortBamFile(bamFile string) string {
 	return sortedBam
 }
 
+
+/*
+Aligns a single or a set of fastq files to a reference gneome.
+*/
 func AlignReads(reference string, readFiles []string, LN int, pairedEnd bool) string {
 	var samFile string
 	if pairedEnd {
@@ -110,6 +125,7 @@ func AlignReads(reference string, readFiles []string, LN int, pairedEnd bool) st
 	return sortedBam
 }
 
+//Takes a sorted bam file and returns a VCF file of it to the reference.
 func MakeVCF(reference, sortedBam string) string {
 	samtoolsMpileup := CreateCommand(cwd + "/bin/samtools mpileup -v --reference " + reference + " " + sortedBam)
 	vcfFile := strings.Split(sortedBam, ".")[0] + ".vcf"
@@ -118,6 +134,7 @@ func MakeVCF(reference, sortedBam string) string {
 	return vcfFile
 }
 
+//Tkaes a VCF files and returns a called VCF file by processing it with bcfTool
 func CallVCF(vcfFile string) string {
 	bcfToolsCall := CreateCommand(cwd + "/bin/bcftools call --threads " + strconv.Itoa(numProcs) + " --ploidy 1 -c " + vcfFile)
 	calledVCFFile := strings.Split(vcfFile, ".")[0] + ".called.vcf"
@@ -125,23 +142,25 @@ func CallVCF(vcfFile string) string {
 	return calledVCFFile
 }
 
+//Given a reference file and a bam file, it call the variants of the data
+// by calling samtools and bcftool
 func CallVariants(reference, sortedBam string) string {
 	vcfFile := MakeVCF(reference, sortedBam)
 	calledVCFFile := CallVCF(vcfFile)
 	return calledVCFFile
 }
 
+//Makes a folder
 func MakeFolder(folder string) string {
 	analysisFolder := cwd + "/" + folder + "/"
 	RunCommand(CreateCommand("mkdir " + analysisFolder))
 	return analysisFolder
 }
 
-func DownloadDriver() {
-	download := CreateCommand("go get -u github.com/murlokswarm/mac")
-	RunCommand(download)
-}
-
+/*
+in older versions of the code, it would automaticall select the sample data
+for you if you did not import files before clicking.
+*/
 func GetSampleData() []string {
 	path := cwd + "/SampleData/"
 	var readFiles []string
@@ -152,12 +171,17 @@ func GetSampleData() []string {
 	return readFiles
 }
 
+//returns the current working directory
 func pwd() string {
 	pwd := CreateCommand("pwd")
 	s := WriteOutputToString(pwd)
 	return s
 }
 
+/*
+Only Align takes in fasta or fastq files and aligns the reads to the MTB reference
+genome
+*/
 func OnlyAlign(readFiles []string) string {
 	//identify oraganism
 	reference, LN := HandleReference()
@@ -172,7 +196,10 @@ func OnlyAlign(readFiles []string) string {
 	}
 	return samFile
 }
-
+/*
+Given a bamfile, ONLYVCF calls the variants and predicts resistances. then
+it returns the path to the VCFFile
+*/
 func OnlyVCF(bamFiles []string) string {
 	reference, _ := HandleReference()
 	IndexReference(reference)
@@ -182,6 +209,11 @@ func OnlyVCF(bamFiles []string) string {
 	return calledVCFFile
 }
 
+/*
+Takes a reference filename and a VCF file name and predicts the drug resistances
+based on the amino acid changes.
+*/
+
 func PredictResistance(reference, calledVCFFile string) string {
 	ReadReference(reference)
 	ShowMutation(calledVCFFile)
@@ -190,6 +222,10 @@ func PredictResistance(reference, calledVCFFile string) string {
 	return resistanceFile
 }
 
+/*
+RunPipeline takes two fasta or fastq files and aligns the reads to the MTB
+reference genome. Then it calls its variants
+*/
 func RunPipeline(readFiles []string) {
 	if len(readFiles) == 0 {
 		fmt.Println("No files recieved")

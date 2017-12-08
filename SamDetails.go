@@ -7,6 +7,11 @@ import(
   "strings"
 )
 
+
+/*
+SamDetails takes an absolute path to a same file. It reads the data from the sam file and makes two histograms.
+Then it returns some metrics on the data back to the UI
+*/
 func SamDetails(samFile string)string{
   prefix := cwd+"/resources/SamPlots"
   reads, qualities, baseLocations := ReadSamFile(samFile)
@@ -20,6 +25,9 @@ func SamDetails(samFile string)string{
   return "Reads Aligned: " +strconv.Itoa(reads)+ "&#13;&#10;" + "Average Quality For Aligned Reads: " + strconv.FormatFloat(averageQuality,'f',2,64)
 }
 
+/*
+reads the sam file line by line, recording metrics on the data as it goes.
+*/
 func ReadSamFile(samFile string) (int, []int, []int){
   file,err := os.Open(samFile)
   qualities := make([]int,0)

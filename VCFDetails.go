@@ -8,7 +8,16 @@ import(
   "gonum.org/v1/plot/vg"
 )
 
-func VCFDetails(){
+/*
+VCF details takes a path to a VCF file. If an anlysis has not been run on it already,
+it predicts resistances based on it. Then for every gene a bar graph is made
+and the number of mutations is drawn.
+*/
+func VCFDetails(vcfFile string){
+  if len(allGenes)==0{
+      reference,_ := HandleReference()
+      PredictResistance(reference,vcfFile)
+  }
 
   prefix := cwd+"/resources/VCFPlots/"
   //mutations by gene

@@ -25,8 +25,9 @@ func WriteResult(allDrug []Drug) string {
 	// Write the result.
 	var geneName string
 	var mutationLine string
-	fmt.Fprintln(resultFile,"DRUG\tGENE\tPOS\tAA\tCOD\tCONF\tDESC")
+	fmt.Fprintf(resultFile,"DRUG\tGENE\tPOS\tAA\tCOD\tCONF\tDESC\n")
 	for i := range allDrug {
+		fmt.Println(allDrug[i].name)
 		for j := range allDrug[i].resistance { //for each gene associated with the drug
 			for k := range allDrug[i].resistance[j].mutations { //for each mutation
 				if allDrug[i].resistance[j].mutations[k].resistance == true {// if the mutation codes for resistance
@@ -44,7 +45,7 @@ func WriteResult(allDrug []Drug) string {
 					DESC := "The change from a "+refPol+" "+refCharge+ " charged amino acid to a "+ altPol + " " + altCharge + " charged amino acid may affect this proteins susceptibility to "+DRUG+
 					". We are "+CONF+"'%' sure this mutation is real."
 					mutationLine = mutationLine + DRUG+"\t"+geneName+"\t"+POS+"\t"+AA+"\t"+COD+"\t"+CONF+"\t"+DESC
-					fmt.Fprintln(resultFile,mutationLine)
+					fmt.Fprintf(resultFile,mutationLine+"\n")
 				}
 			}
 		}

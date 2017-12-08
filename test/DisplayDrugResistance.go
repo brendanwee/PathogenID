@@ -10,8 +10,8 @@ import (
 	"fmt"
 )
 
-//TURN BACK! THIS CODE IS HIDEOUS!!!!! I couldnt figure out how to generate HTML
-//Using any type of control structure.
+//TURN BACK! THIS CODE IS HIDEOUS!!!!! Quite possibly the most naive code I have
+//ever written.
 
 type FinalTable struct {
 	Title string
@@ -310,14 +310,140 @@ func init() {
 	app.RegisterComponent(&FinalTable{})
 }
 
-func main() {
+func (p *FinalTable)DisplayFinalTable(resultFile string) {
 	file,_ := os.open("/Users/BrendanW/Documents/GitHub/PathogenID/Analysis/Results/DrugResistance.txt")
 	scanner := bufio.NewScanner(file)
+	scanner.Scan()
+	count :=0
 	for scanner.Scan(){
 		items := strings.Split(scanner.Text(), "\t")
-		if items[0][0]<60 && imets[0][0]> 47 { //Mutation
-			
+		switch items[0]{
+			case "Rifampin":
+				if !p.RIF{ //rifampin first time
+					p.RIF=true
+					count = 1
+					p.rif1gene = append(items[:4],items[6])
+				} else if count==1&&p.RIF{
+					p.rif2gene = append(items[:4],items[6])
+					count +=1
+				} else if count==2&&p.RIF{
+					p.rif3gene = append(items[:4],items[6])
+					count +=1
+				} else { //count is too high
+					continue
+				}
+			case "Isoniazid":
+				if !p.INH{ //INHampin first time
+					p.INH=true
+					count = 1
+					p.inh1gene = append(items[:4],items[6])
+				} else if count==1&&p.INH{
+					p.inh2gene = append(items[:4],items[6])
+					count +=1
+				} else if count==2&&p.INH{
+					p.inh3gene = append(items[:4],items[6])
+					count +=1
+				} else { //count is too high
+					continue
+				}
+			case "Pyrazinamide":
+				if !p.PZA{ //rifampin first time
+					p.PZA=true
+					count = 1
+					p.pza1gene = append(items[:4],items[6])
+				} else if count==1&&p.PZA{
+					p.pza2gene = append(items[:4],items[6])
+					count +=1
+				} else if count==2&&p.PZA{
+					p.pza3gene = append(items[:4],items[6])
+					count +=1
+				} else { //count is too high
+					continue
+				}
+			case "Streptomycin":
+				if !p.SM{ //rifampin first time
+					p.Sm=true
+					count = 1
+					p.sm1gene = append(items[:4],items[6])
+				} else if count==1&&p.SM{
+					p.sm2gene = append(items[:4],items[6])
+					count +=1
+				} else if count==2&&p.SM{
+					p.sm3gene = append(items[:4],items[6])
+					count +=1
+				} else { //count is too high
+					continue
+				}
+			case "Aminoglycosides":
+				if !p.AMI{ //rifampin first time
+					p.AMI=true
+					count = 1
+					p.ami1gene = append(items[:4],items[6])
+				} else if count==1&&p.AMI{
+					p.ami2gene = append(items[:4],items[6])
+					count +=1
+				} else if count==2&&p.AMI{
+					p.ami3gene = append(items[:4],items[6])
+					count +=1
+				} else { //count is too high
+					continue
+				}
+			case "Ethambutol":
+				if !p.EMB{ //rifampin first time
+					p.EMB=true
+					count = 1
+					p.emb1gene = append(items[:4],items[6])
+				} else if count==1&&p.EMB{
+					p.emb2gene = append(items[:4],items[6])
+					count +=1
+				} else if count==2&&p.EMB{
+					p.emb3gene = append(items[:4],items[6])
+					count +=1
+				} else { //count is too high
+					continue
+				}
+			case "Ethionamide":
+				if !p.ETH{ //rifampin first time
+					p.ETH=true
+					count = 1
+					p.eth1gene = append(items[:4],items[6])
+				} else if count==1&&p.ETH{
+					p.eth2gene = append(items[:4],items[6])
+					count +=1
+				} else if count==2&&p.ETH{
+					p.eth3gene = append(items[:4],items[6])
+					count +=1
+				} else { //count is too high
+					continue
+				}
+			case "Fluoroquinolones":
+				if !p.FLQ{ //rifampin first time
+					p.FLQ=true
+					count = 1
+					p.flq1gene = append(items[:4],items[6])
+				} else if count==1&&p.FLQ{
+					p.flq2gene = append(items[:4],items[6])
+					count +=1
+				} else if count==2&&p.FLQ{
+					p.flq3gene = append(items[:4],items[6])
+					count +=1
+				} else { //count is too high
+					continue
+				}
+			case "Para-Aminosalicylic Acid":
+				if !p.PAS{ //rifampin first time
+					p.PAS=true
+					count = 1
+					p.pas1gene = append(items[:4],items[6])
+				} else if count==1&&p.PAS{
+					p.pas2gene = append(items[:4],items[6])
+					count +=1
+				} else if count==2&&p.PAS{
+					p.pas3gene = append(items[:4],items[6])
+					count +=1
+				} else { //count is too high
+					continue
+				}
 		}
 	}
-
 }

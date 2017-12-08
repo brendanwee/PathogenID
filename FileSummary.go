@@ -23,7 +23,7 @@ func (f *FileSummary) Render() string {
     <button onclick="OnSAMButtonClick">Show .sam file</button>
     <button onclick="OnVariantButtonClick">Show .vcf file</button>
     <button onclick="OnClinicalButtonClick">Drug database</button>
-    <button onclick="OnResistenceButtonClick">Drug-Resistence result</button>
+    <button onclick="OnResistenceButtonClick">Drug-Resistance result</button>
     <button_go_back onclick="OnGoBackButtonClick">Go Back to Analysis</button_go_back>
 	</div>
 </div>
@@ -47,19 +47,26 @@ func (g *Graph) Render() string {
   			src="Fastq_Plots/BaseContent.png"
   			alt="An awesome picture"/>
 		</figure>
-		<button onclick = "CloseSubWin">Close</button>
+		<button_go_back onclick = "CloseSubWin">Close</button_go_back>
 	</div>
 </div>
 	`
 }
 
+// Close SubWin is called when the Close button is clicked
+func (g *Graph) CloseSubWin() {
+	subWin.Close()
+}
+
 // newSubWindow creates a new small window to display the plots
-func newSubWindow() app.Contexter {
+func newSubWindow() app.Windower {
 	// Creates a window context.
 	subwin := app.NewWindow(app.Window{
 		Title:          "Pathogen ID",
-		Width:          640,
-		Height:         360,
+		Width:          1280,
+		Height:         720,
+		X:              500,
+		Y:              500,
 		TitlebarHidden: true,
 		MinimizeHidden: false,
 		OnClose: func() bool {
@@ -67,7 +74,7 @@ func newSubWindow() app.Contexter {
 			return true
 		},
 	})
-	graph := &Graph{}   // Creates a Hello component.
+	graph := &Graph{}   // Creates a Graph component.
 	subwin.Mount(graph) // Mounts the Hello component into the window context.
 	//	graph.Figure = "profile-pictures/logo.png" // parse the source of the image
 	//	app.Render(graph)
@@ -80,6 +87,8 @@ func (f *FileSummary) OnFastqButtonClick() {
 		f.Output = "There's no .fastq files. &#13;&#10; Please use Ctrl + O to open up .fastq files"
 		app.Render(f) // Tells the app to update the rendering of the component.
 	} else {
+		f.Output = "Please wait for the display"
+		app.Render(f)
 		f.Output = FastDetails(fastq) // Read in a slice of .fastq filename strings and return its summary as a string
 		app.Render(f)                 // Tells the app to update the rendering of the component.
 		subWin = newSubWindow()       // Pop up a new window for the graph display
@@ -92,6 +101,8 @@ func (f *FileSummary) OnSAMButtonClick() {
 		f.Output = "There's no .sam files. &#13;&#10; Please use Ctrl + O to open up .sam files"
 		app.Render(f) // Tells the app to update the rendering of the component.
 	} else {
+		f.Output = "Please wait for the display"
+		app.Render(f)
 		f.Output = SamDetails(sam[0]) // Read in the filename of .sam file and return its summary as a tring
 		app.Render(f)                 // Tells the app to update the rendering of the component.
 		subWin = newSubWindow()       // Pop up a new window for the graph display
@@ -102,8 +113,15 @@ func (f *FileSummary) OnSAMButtonClick() {
 func (f *FileSummary) OnVariantButtonClick() {
 	if len(vcf) == 0 { // if there's no .fastq files
 		f.Output = "There's no .vcf files. &#13;&#10; Please use Ctrl + O to open up .vcf files"
-		app.Render(f) // Tells the app to update the rendering of the component.
+		app.Render(f)               // Tells the app to update the rendering of the component.
+		analyze := &AnalyzeButton{} // creates a AnalyzeButton component.
+		win.Mount(analyze)          // Mounts the AnalyzeButton component into the window context.
+		analyze.Info = "Please select the .vcf file"
+		app.Render(analyze)
+		PickFile(analyze, &vcf, "Drug")
 	} else {
+		f.Output = "Please wait for the display"
+		app.Render(f)
 		f.Output = "Fastq summay present here!  &#13;&#10; We can start a new line here too."
 		app.Render(f)           // Tells the app to update the rendering of the component.
 		subWin = newSubWindow() // Pop up a new window for the graph display
@@ -116,6 +134,8 @@ func (f *FileSummary) OnClinicalButtonClick() {
 		f.Output = "There's no database files. &#13;&#10; Please use Ctrl + O to open up database files"
 		app.Render(f) // Tells the app to update the rendering of the component.
 	} else {
+		f.Output = "Please wait for the display"
+		app.Render(f)
 		f.Output = "Fastq summay present here!  &#13;&#10; We can start a new line here too."
 		app.Render(f)           // Tells the app to update the rendering of the component.
 		subWin = newSubWindow() // Pop up a new window for the graph display
@@ -128,10 +148,14 @@ func (f *FileSummary) OnResistenceButtonClick() {
 		f.Output = "There's no result files. &#13;&#10; Please use Ctrl + O to open up .txt result files"
 		app.Render(f) // Tells the app to update the rendering of the component.
 	} else {
-		/*subwin := app.NewWindow(app.Window{
+		f.Output = "Please wait for the display"
+		app.Render(f)
+		subWin = app.NewWindow(app.Window{
 			Title:          "Pathogen ID",
-			Width:          640,
-			Height:         360,
+			Width:          1280,
+			Height:         720,
+			X:              500,
+			Y:              500,
 			TitlebarHidden: true,
 			MinimizeHidden: false,
 			OnClose: func() bool {
@@ -139,11 +163,10 @@ func (f *FileSummary) OnResistenceButtonClick() {
 				return true
 			},
 		})
-		table := &FinalTable{}   // Creates a Hello component.
-		subwin.Mount(table) // Mounts the Hello component into the window context.
-		// graph.Figure = "profile-pictures/logo.png" // parse the source of the image
-
-		app.Render(table)*/
+		final := &FinalTable{} // Creates a Graph component.
+		subWin.Mount(final)    // Mounts the Hello component into the window context.
+		final.DisplayFinalTable(resistence[0])
+		app.Render(final)
 		f.Output = "Fastq summay present here!  &#13;&#10; We can start a new line here too."
 		app.Render(f)           // Tells the app to update the rendering of the component.
 		subWin = newSubWindow() // Pop up a new window for the graph display

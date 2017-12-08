@@ -1,0 +1,28 @@
+body {
+  overflow: hidden;
+}
+table, th, td {
+	border: 3px solid black;
+	border-collapse: collapse;
+}
+th {
+	font-size: 30px;
+	color: rgb(205,184,158);
+	padding: 10px;
+	text-align: center;
+}
+td {
+	padding: 10px;
+	text-align: left;
+}
+table tr:nth-child(2) {
+	background-color: rgb(233,0,0);
+	color: black;
+}
+table tr:nth-child(odd) {
+	background-color:rgb(136,131,188);
+}
+table tr:nth-child(3) {
+	background-color: rgb(233,122,130);
+	color: black;
+}

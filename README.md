@@ -43,22 +43,16 @@ if hg turns up, and the two packages are in the go src along side this package a
 
 ## Authors
 
-* **Brendan Wee** - *Initial work* - [Bweestyle](https://github.com/Bweestyle)
+* **Brendan Wee** - [Bweestyle](https://github.com/Bweestyle)
 
-* **Jinke Liu** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
+* **Jinke Liu**
 
-* **Xiaodi Pan** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
+* **Xiaodi Pan**
 
-* **Chaoying Wang** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
+* **Chaoying Wang**
 
 See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Acknowledgments
-
-* Hat tip to anyone who's code was used
-* Inspiration
-* etc
